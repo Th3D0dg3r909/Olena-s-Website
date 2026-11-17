@@ -9,8 +9,6 @@ a { color: inherit; }
 .brand span { font: .9rem system-ui, sans-serif; }
 main { max-width: 68rem; margin: auto; padding: 0 1.25rem; }
 section { padding: clamp(2rem, 6vw, 5rem) 0; border-bottom: 1px solid var(--line); }
-.hero { text-align: center; padding-inline: 1rem; background: radial-gradient(ellipse at center, #e5eadc, transparent 75%); }
-.location { letter-spacing: .19em; text-transform: uppercase; }
 h1, h2, h3 { font-family: Georgia, serif; font-weight: normal; line-height: 1.08; }
 h1 { font-size: clamp(2.9rem, 8vw, 6.5rem); margin: .25em auto; max-width: 12ch; }
 h2 { font-size: clamp(2rem, 4vw, 3.25rem); margin: 0 0 .5em; }
@@ -24,23 +22,48 @@ button, .button { display: inline-block; width: fit-content; font: inherit; padd
 button:disabled { opacity: .65; cursor: default; }
 article button { margin: .2rem .5rem .2rem 0; }
 :focus-visible { outline: 3px solid #a25632; outline-offset: 3px; }
-:root { --ink: #302b24; --paper: #faf5ed; --green: #3e503e; --line: #ddd2c4; }
-nav { flex-wrap: wrap; gap: .4rem 1.25rem; }
-.hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(1.25rem, 5vw, 4rem); padding-inline: 0; text-align: left; background: none; }
-.hero h1 { margin-inline: 0; font-size: clamp(2.75rem, 6.5vw, 5.65rem); }
-.hero-photo { margin: 0; position: relative; }
-.hero-photo img { display: block; width: 100%; aspect-ratio: 5 / 4; object-fit: cover; border-radius: 8rem 8rem .75rem .75rem; background: #e5dbcb; }
-.hero-photo figcaption { position: absolute; bottom: .75rem; right: .75rem; background: var(--paper); border-radius: 2rem; padding: .2rem .65rem; font-size: .8rem; }
-#behandelingen article { display: flex; flex-direction: column; align-items: flex-start; }
+
+.studio { --ink: #302820; --paper: #f8f3eb; --green: #48513f; --line: #d9cbba; }
+.studio header { background: #f8f3eb; min-height: 4.75rem; }
+.studio nav { flex-wrap: wrap; align-items: center; gap: .45rem 1.4rem; }
+.studio nav a { text-decoration: none; }
+.studio nav a:hover { text-decoration: underline; }
+.nav-book { border: 1px solid var(--green); border-radius: 2rem; padding: .35rem .9rem; }
+.studio main { max-width: none; padding: 0; }
+.studio section { padding-inline: max(5vw, calc((100% - 68rem) / 2)); }
+.studio h1, .studio h2, .studio h3 { font-family: 'Baskervville', 'Palatino Linotype', Palatino, serif; letter-spacing: -.035em; }
+.hero { display: grid; position: relative; isolation: isolate; align-items: end; min-height: clamp(34rem, 74svh, 53rem); color: #fffaf0; background: #32271f; }
+.hero-photo, .hero-photo img, .hero::after { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; }
+.hero-photo { z-index: -2; }
+.hero-photo img { object-fit: cover; object-position: center; }
+.hero::after { content: ''; z-index: -1; background: linear-gradient(90deg, #211911ed, #2119119c 48%, #21191122); }
+.hero-copy { max-width: 38rem; padding-bottom: clamp(1rem, 4vw, 3rem); }
+.hero h1 { font-size: clamp(3.25rem, 9vw, 7.5rem); margin: .18em 0; }
+.hero-copy > p { max-width: 34ch; }
+.location { letter-spacing: .15em; text-transform: uppercase; font-size: .75rem; }
+.hero-photo figcaption { position: absolute; z-index: 1; bottom: 1rem; right: 1rem; padding: .2rem .65rem; border-radius: 1rem; background: #211911e8; font-size: .8rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.5rem; }
+.studio .button, .studio button { border-radius: 2rem; border: 1px solid transparent; }
+.studio .secondary { background: transparent; border-color: currentColor; color: inherit; }
+.hero .button:not(.secondary) { background: #f8f0e4; color: #302820; }
+.studio .button:hover, .studio button:not(:disabled):hover { filter: brightness(.88); }
+.intro { text-align: center; background: #eee3d4; }
+.intro p { max-width: 48ch; margin-inline: auto; }
+#behandelingen article { display: flex; flex-direction: column; align-items: flex-start; padding: clamp(1.25rem, 3vw, 2.4rem); border-radius: .6rem; background: #fdf9f2; }
+#behandelingen article h3 { font-size: clamp(1.6rem, 3vw, 2.15rem); margin: 0; }
 #behandelingen article p { flex: 1; }
-#behandelingen article h3 { font-size: 1.55rem; margin: .25rem 0 0; }
-.button:hover, button:not(:disabled):hover { background: #2d3e2e; }
+.booking-section { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(1rem, 5vw, 4rem); background: #eee3d4; }
+.booking-panel { background: #fdf9f2; padding: clamp(1rem, 3vw, 2rem); border-radius: .6rem; }
+.booking-panel form { max-width: none; }
+.booking-panel #status:empty { margin: 0; }
+.studio footer { background: #302820; color: #fffaf0; }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
   #behandelingen article { transition: box-shadow .2s ease, transform .2s ease; }
-  #behandelingen article:hover, #behandelingen article:focus-within { transform: translateY(-3px); box-shadow: 0 12px 28px #39271916; }
+  #behandelingen article:hover, #behandelingen article:focus-within { transform: translateY(-3px); box-shadow: 0 12px 28px #39271918; }
 }
 @media (max-width: 42rem) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-photo img { aspect-ratio: 4 / 3; }
+  .hero::after { background: linear-gradient(0deg, #211911f5, #21191189 75%, #21191145); }
+  .hero-copy { padding-bottom: 1.5rem; }
+  .booking-section { grid-template-columns: 1fr; }
 }
