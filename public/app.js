@@ -30,19 +30,30 @@ async function load() {
     choose.textContent = 'Kies ' + item.name.toLowerCase();
     choose.addEventListener('click', () => {
       service.value = item.id;
+      updateWhatsApp();
       window.location.hash = 'afspraak';
       day.focus({ preventScroll: true });
     });
     card.append(heading, description, choose);
     return card;
   }));
-  if (options.whatsapp) {
-    const link = document.querySelector('#whatsapp');
-    link.href = 'https://wa.me/' + options.whatsapp;
-    link.hidden = false;
-  }
+  const contact = document.querySelector('[data-whatsapp]');
+  if (options.whatsapp) contact.href = 'https://wa.me/' + options.whatsapp;
+  updateWhatsApp();
   updateTimes();
 }
+function updateWhatsApp() {
+  const contact = document.querySelector('[data-whatsapp]');
+  const bookingLink = document.querySelector('#whatsapp');
+  const treatment = service.selectedOptions[0]?.textContent;
+  const message = treatment
+    ? 'Hallo Olena, ik wil graag meer weten over de behandeling ' + treatment + '.'
+    : 'Hallo Olena, ik heb een vraag over de behandelingen.';
+  const url = new URL(contact.href);
+  url.searchParams.set('text', message);
+  bookingLink.href = url.href;
+}
+service.addEventListener('change', updateWhatsApp);
 day.addEventListener('change', updateTimes);
 form.addEventListener('submit', async event => {
   event.preventDefault();
