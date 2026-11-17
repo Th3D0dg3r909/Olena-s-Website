@@ -24,3 +24,23 @@ button, .button { display: inline-block; width: fit-content; font: inherit; padd
 button:disabled { opacity: .65; cursor: default; }
 article button { margin: .2rem .5rem .2rem 0; }
 :focus-visible { outline: 3px solid #a25632; outline-offset: 3px; }
+:root { --ink: #302b24; --paper: #faf5ed; --green: #3e503e; --line: #ddd2c4; }
+nav { flex-wrap: wrap; gap: .4rem 1.25rem; }
+.hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(1.25rem, 5vw, 4rem); padding-inline: 0; text-align: left; background: none; }
+.hero h1 { margin-inline: 0; font-size: clamp(2.75rem, 6.5vw, 5.65rem); }
+.hero-photo { margin: 0; position: relative; }
+.hero-photo img { display: block; width: 100%; aspect-ratio: 5 / 4; object-fit: cover; border-radius: 8rem 8rem .75rem .75rem; background: #e5dbcb; }
+.hero-photo figcaption { position: absolute; bottom: .75rem; right: .75rem; background: var(--paper); border-radius: 2rem; padding: .2rem .65rem; font-size: .8rem; }
+#behandelingen article { display: flex; flex-direction: column; align-items: flex-start; }
+#behandelingen article p { flex: 1; }
+#behandelingen article h3 { font-size: 1.55rem; margin: .25rem 0 0; }
+.button:hover, button:not(:disabled):hover { background: #2d3e2e; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  #behandelingen article { transition: box-shadow .2s ease, transform .2s ease; }
+  #behandelingen article:hover, #behandelingen article:focus-within { transform: translateY(-3px); box-shadow: 0 12px 28px #39271916; }
+}
+@media (max-width: 42rem) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-photo img { aspect-ratio: 4 / 3; }
+}

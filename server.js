@@ -46,6 +46,7 @@ const hash = (value) => createHash('sha256').update(value).digest();
 const adminHash = adminPassword && hash('Basic ' + Buffer.from('olena:' + adminPassword).toString('base64'));
 const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
+  '/studio.webp': ['studio.webp', 'image/webp'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/admin': ['admin.html', 'text/html; charset=utf-8'],

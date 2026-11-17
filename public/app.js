@@ -25,7 +25,15 @@ async function load() {
     const description = document.createElement('p');
     heading.textContent = item.name;
     description.textContent = item.description;
-    card.append(heading, description);
+    const choose = document.createElement('button');
+    choose.type = 'button';
+    choose.textContent = 'Kies ' + item.name.toLowerCase();
+    choose.addEventListener('click', () => {
+      service.value = item.id;
+      window.location.hash = 'afspraak';
+      day.focus({ preventScroll: true });
+    });
+    card.append(heading, description, choose);
     return card;
   }));
   if (options.whatsapp) {
