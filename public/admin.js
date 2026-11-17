@@ -1,8 +1,8 @@
 const status = document.querySelector('#status');
 const list = document.querySelector('#bookings');
 const labels = { pending: 'In behandeling', confirmed: 'Bevestigd', declined: 'Afgewezen' };
-async function request(method, body) {
-  const response = await fetch('/api/admin/bookings', {
+async function request(method, body, endpoint = 'bookings') {
+  const response = await fetch('/api/admin/' + endpoint, {
     method,
     headers: { 'Content-Type': 'application/json', 'X-Olena-Request': '1' },
     body: JSON.stringify(body),
@@ -11,9 +11,45 @@ async function request(method, body) {
   if (!response.ok) throw new Error(result.error);
   return result;
 }
+const date = document.querySelector('#planning-day');
+const schedule = document.querySelector('#planning-slots');
+const planningStatus = document.querySelector('#planning-status');
+let planning;
+let bookings = [];
+
 async function load() {
-  const bookings = await request('GET');
-  list.replaceChildren(...bookings.map(booking => {
+  [bookings, planning] = await Promise.all([request('GET'), request('GET', undefined, 'planning')]);
+  if (!date.value) date.value = planning.today;
+  render();
+}
+function render() {
+  const day = date.value;
+  const dailyBookings = bookings.filter(booking => booking.day === day);
+  schedule.replaceChildren();
+  const slots = [
+    ...planning.free.map(slot => ({ ...slot, blocked: false })),
+    ...planning.blocked.map(slot => ({ ...slot, blocked: true })),
+  ].filter(slot => slot.day === day).sort((a, b) => a.time.localeCompare(b.time));
+  for (const slot of slots) {
+    const button = document.createElement('button');
+    button.textContent = slot.time + (slot.blocked ? ' · Vrijgeven' : ' · Blokkeren');
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      try {
+        await request('PATCH', { ...slot, blocked: !slot.blocked }, 'planning');
+        planningStatus.textContent = slot.blocked ? 'Tijdslot vrijgegeven.' : 'Tijdslot geblokkeerd.';
+        await load();
+      } catch (error) {
+        planningStatus.textContent = error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+    schedule.append(button);
+  }
+  if (!slots.length) schedule.textContent = 'Geen vrije of geblokkeerde tijdsloten voor deze datum.';
+
+  list.replaceChildren(...dailyBookings.map(booking => {
     const card = document.createElement('article');
     const heading = document.createElement('h3');
     const details = document.createElement('p');
@@ -45,6 +81,11 @@ async function load() {
     }
     return card;
   }));
-  if (!bookings.length) status.textContent = 'Er zijn nog geen aanvragen.';
+  if (!dailyBookings.length) list.textContent = 'Geen aanvragen of afspraken op deze datum.';
 }
+date.addEventListener('change', () => {
+  planningStatus.textContent = '';
+  status.textContent = '';
+  if (planning) render();
+});
 load().catch(error => { status.textContent = error.message; });

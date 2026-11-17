@@ -18,17 +18,21 @@ db.exec(`
     name TEXT NOT NULL, email TEXT NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('pending','confirmed','declined'))
   );
+  CREATE TABLE IF NOT EXISTS blocked_slots (day TEXT NOT NULL, time TEXT NOT NULL, PRIMARY KEY(day,time));
   CREATE UNIQUE INDEX IF NOT EXISTS occupied_slot ON bookings(day,time) WHERE status != 'declined';
 `);
 const local = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit',
   hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
 });
-function slots() {
+function slots({ includeBlocked = false } = {}) {
   const [today, now] = local.format(new Date()).split(' ');
   const date = new Date(today + 'T00:00:00Z');
   const occupied = new Set(db.prepare("SELECT day,time FROM bookings WHERE day >= ? AND status != 'declined'").all(today)
     .map(({ day, time }) => day + 'T' + time));
+  if (!includeBlocked) {
+    for (const { day, time } of db.prepare("SELECT day,time FROM blocked_slots WHERE day >= ?").all(today)) occupied.add(day + "T" + time);
+  }
   const result = [];
   for (let offset = 0; offset < 28; offset++, date.setUTCDate(date.getUTCDate() + 1)) {
     if ([0, 6].includes(date.getUTCDay())) continue;
@@ -99,10 +103,31 @@ createServer(async (req, res) => {
           !services.some(service => service.id === body.service)) return reply(400, { error: 'Controleer je naam, e-mailadres en behandeling.' });
       if (!slots().some(slot => slot.day === body.day && slot.time === body.time)) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
       const id = randomUUID();
-      const result = db.prepare("INSERT INTO bookings VALUES (?,?,?,?,?,?,'pending') ON CONFLICT DO NOTHING")
-        .run(id, body.day, body.time, body.service, name, email);
+      const result = db.prepare("INSERT INTO bookings SELECT ?,?,?,?,?,?,'pending' WHERE NOT EXISTS (SELECT 1 FROM blocked_slots WHERE day = ? AND time = ?) ON CONFLICT DO NOTHING")
+        .run(id, body.day, body.time, body.service, name, email, body.day, body.time);
       if (!result.changes) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
       return reply(201, { id });
+    }
+    if (route === '/api/admin/planning' && req.method === 'GET') {
+      const [today] = local.format(new Date()).split(' ');
+      return reply(200, { today, free: slots(), blocked: db.prepare('SELECT day,time FROM blocked_slots WHERE day >= ? ORDER BY day,time').all(today) });
+    }
+    if (route === '/api/admin/planning' && req.method === 'PATCH') {
+      const body = await readBody(req).catch(() => null);
+      if (!body || typeof body.day !== 'string' || typeof body.time !== 'string' || typeof body.blocked !== 'boolean') {
+        return reply(400, { error: 'Kies een datum en tijdslot.' });
+      }
+      if (!body.blocked) {
+        db.prepare('DELETE FROM blocked_slots WHERE day = ? AND time = ?').run(body.day, body.time);
+        return reply(200, { blocked: false });
+      }
+      if (!slots({ includeBlocked: true }).some(slot => slot.day === body.day && slot.time === body.time)) {
+        return reply(409, { error: 'Dit tijdslot is niet vrij of ligt buiten de boekingsperiode.' });
+      }
+      const result = db.prepare(`INSERT INTO blocked_slots SELECT ?,? WHERE NOT EXISTS (
+        SELECT 1 FROM bookings WHERE day = ? AND time = ? AND status != 'declined'
+      ) ON CONFLICT DO NOTHING`).run(body.day, body.time, body.day, body.time);
+      return result.changes ? reply(200, { blocked: true }) : reply(409, { error: 'Dit tijdslot is al bezet of geblokkeerd.' });
     }
     if (req.method === 'GET' && route === '/api/admin/bookings') {
       return reply(200, db.prepare('SELECT * FROM bookings ORDER BY day DESC,time DESC').all()
