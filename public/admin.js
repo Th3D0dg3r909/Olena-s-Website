@@ -24,7 +24,8 @@ async function load() {
 }
 function render() {
   const day = date.value;
-  const dailyBookings = bookings.filter(booking => booking.day === day);
+  document.querySelector('#selected-day').textContent = day ? dayFormat.format(new Date(day)) : 'Kies een datum';
+  const dailyBookings = bookings.filter(booking => booking.day === day).sort((a, b) => a.time.localeCompare(b.time));
   schedule.replaceChildren();
   const slots = [
     ...planning.free.map(slot => ({ ...slot, blocked: false })),
@@ -32,7 +33,15 @@ function render() {
   ].filter(slot => slot.day === day).sort((a, b) => a.time.localeCompare(b.time));
   for (const slot of slots) {
     const button = document.createElement('button');
-    button.textContent = slot.time + (slot.blocked ? ' · Vrijgeven' : ' · Blokkeren');
+    const row = document.createElement('div');
+    row.className = 'planner-slot';
+    const time = document.createElement('strong');
+    time.textContent = slot.time;
+    const badge = document.createElement('span');
+    badge.className = 'planner-badge ' + (slot.blocked ? 'blocked' : 'free');
+    badge.textContent = slot.blocked ? 'Geblokkeerd' : 'Vrij';
+    button.textContent = slot.blocked ? 'Vrijgeven' : 'Blokkeren';
+    button.setAttribute('aria-label', button.textContent + ' om ' + slot.time);
     button.addEventListener('click', async () => {
       button.disabled = true;
       try {
@@ -45,7 +54,8 @@ function render() {
         button.disabled = false;
       }
     });
-    schedule.append(button);
+    row.append(time, badge, button);
+    schedule.append(row);
   }
   if (!slots.length) schedule.textContent = 'Geen vrije of geblokkeerde tijdsloten voor deze datum.';
 
@@ -55,10 +65,13 @@ function render() {
     const details = document.createElement('p');
     const email = document.createElement('a');
     heading.textContent = booking.service;
-    details.textContent = [booking.day, booking.time, booking.name, labels[booking.status]].join(' · ');
+    details.textContent = [booking.time, booking.name].join(' · ');
+    const badge = document.createElement('span');
+    badge.className = 'planner-badge ' + booking.status;
+    badge.textContent = labels[booking.status];
     email.textContent = booking.email;
     email.href = 'mailto:' + encodeURIComponent(booking.email);
-    card.append(heading, details, email);
+    card.append(badge, heading, details, email);
     if (booking.status === 'pending') {
       const actions = document.createElement('div');
       for (const [next, label] of [['confirmed', 'Bevestigen'], ['declined', 'Afwijzen']]) {
@@ -83,6 +96,21 @@ function render() {
   }));
   if (!dailyBookings.length) list.textContent = 'Geen aanvragen of afspraken op deze datum.';
 }
+const dayFormat = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
+for (const button of document.querySelectorAll('[data-step]')) {
+  button.addEventListener('click', () => {
+    if (!planning) return;
+    const next = new Date(date.value || planning.today);
+    next.setUTCDate(next.getUTCDate() + Number(button.dataset.step));
+    date.value = next.toISOString().slice(0, 10);
+    date.dispatchEvent(new Event('change'));
+  });
+}
+document.querySelector('#today').addEventListener('click', () => {
+  if (!planning) return;
+  date.value = planning.today;
+  date.dispatchEvent(new Event('change'));
+});
 date.addEventListener('change', () => {
   planningStatus.textContent = '';
   status.textContent = '';

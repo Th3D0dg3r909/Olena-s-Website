@@ -67,3 +67,27 @@ article button { margin: .2rem .5rem .2rem 0; }
   .hero-copy { padding-bottom: 1.5rem; }
   .booking-section { grid-template-columns: 1fr; }
 }
+
+.planner { --paper: #f8f3eb; --ink: #302820; --green: #48513f; --line: #ded2c3; }
+.planner main { padding-block: clamp(1.5rem, 4vw, 3.5rem); }
+.planner h1 { font-size: clamp(3rem, 7vw, 5rem); }
+.planner-toolbar, .planner-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.planner-toolbar { justify-content: space-between; gap: 1rem; margin-block: 1.5rem; }
+.planner-toolbar h2 { margin: 0; font-size: 1.6rem; }
+.planner-controls button, .planner-slot button { color: var(--green); background: #fffdf8; border: 1px solid var(--line); }
+.planner-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 1rem; align-items: start; }
+.planner-grid section { background: #fffdf8; padding: clamp(1rem, 3vw, 1.75rem); border: 1px solid var(--line); border-radius: 1rem; }
+.planner-grid h2 { font-size: 1.8rem; }
+.planner-grid [role="status"]:empty { margin: 0; }
+.planner-slot { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; padding-block: .65rem; border-bottom: 1px solid var(--line); }
+.planner-slot button { margin-left: auto; padding: .35rem .65rem; }
+.planner-badge { display: inline-block; border-radius: 2rem; padding: .15rem .6rem; font-size: .83rem; background: #ebe4dc; color: #533e32; }
+.planner-badge.confirmed, .planner-badge.free { background: #e1eadb; color: #29422c; }
+.planner-badge.pending { background: #f8e9c6; color: #644617; }
+.planner #bookings article { margin-top: .75rem; }
+.planner #bookings h3 { margin: .6rem 0; font-size: 1.35rem; }
+.planner #bookings p { margin: .35rem 0; }
+.planner #bookings a { overflow-wrap: anywhere; }
+@media (max-width: 48rem) {
+  .planner-grid { grid-template-columns: 1fr; }
+}
