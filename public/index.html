@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Olena Skin Care Studio in Leiden. Bekijk de behandelingen en vraag online een afspraak aan.">
+<title>Olena Skin Care Studio | Leiden</title>
+<link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+<header><a class="brand" href="/">Olena <span>Skin Care Studio</span></a><nav aria-label="Hoofdnavigatie"><a href="#behandelingen">Behandelingen</a><a href="#afspraak">Afspraak</a></nav></header>
+<main>
+<section class="hero"><p class="location">Leiden</p><h1>Olena Skin Care Studio</h1><p>Even tijd voor jezelf en aandacht voor je huid.</p><a class="button" href="#afspraak">Vraag een afspraak aan</a></section>
+<section id="behandelingen"><h2>Behandelingen</h2><p>Voorbeeldbehandelingen voor deze testversie.</p><div class="cards" id="services"></div></section>
+<section id="afspraak"><h2>Vraag een afspraak aan</h2><p>Kies een behandeling en tijdslot. Olena beoordeelt je aanvraag en neemt contact met je op per e-mail.</p>
+<form id="booking">
+<label>Behandeling<select name="service" required></select></label>
+<label>Datum<select name="day" required></select></label>
+<label>Tijd (Nederlandse tijd)<select name="time" required></select></label>
+<label>Naam<input name="name" autocomplete="name" maxlength="100" required></label>
+<label>E-mailadres<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+<p>Je naam en e-mailadres worden gebruikt om je afspraak af te handelen.</p>
+<button disabled>Aanvraag versturen</button>
+</form><p id="status" role="status"></p><a id="whatsapp" hidden>Stel een vraag via WhatsApp</a>
+</section></main><footer>Olena Skin Care Studio · Leiden</footer></body></html>
