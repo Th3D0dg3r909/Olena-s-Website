@@ -4,6 +4,7 @@ import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
+const translations = JSON.parse(readFileSync(new URL('./translations.json', import.meta.url)));
 const services = JSON.parse(readFileSync(new URL('./services.json', import.meta.url)));
 const path = process.env.DATABASE_PATH || './data/bookings.sqlite';
 mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
@@ -62,6 +63,8 @@ const hash = (value) => createHash('sha256').update(value).digest();
 const adminHash = adminPassword && hash('Basic ' + Buffer.from('olena:' + adminPassword).toString('base64'));
 const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
+  '/index.en.html': ['index.en.html', 'text/html; charset=utf-8'],
+  '/translations.json': ['../translations.json', 'application/json; charset=utf-8'],
   '/studio.webp': ['studio.webp', 'image/webp'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
@@ -83,7 +86,9 @@ createServer(async (req, res) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'no-store');
+  const english = new URL(req.url, 'http://localhost').searchParams.get('lang') === 'en';
   const reply = (status, data) => {
+    if (english && data?.error) data = { ...data, error: translations[data.error] || data.error };
     res.writeHead(status, {'Content-Type': 'application/json; charset=utf-8'});
     res.end(JSON.stringify(data));
   };
@@ -97,7 +102,7 @@ createServer(async (req, res) => {
       }
     }
     if (req.method === 'GET' && assets.has(route)) {
-      const [body, type] = assets.get(route);
+      const [body, type] = assets.get(route === '/' && english ? '/index.en.html' : route);
       res.writeHead(200, { 'Content-Type': type });
       return res.end(body);
     }
@@ -105,7 +110,7 @@ createServer(async (req, res) => {
       const whatsapp = process.env.WHATSAPP_NUMBER || '';
       const serviceId = new URL(req.url, 'http://localhost').searchParams.get('service');
       const selected = services.find(item => item.id === serviceId) || services[0];
-      return reply(200, { services, slots: slots({ duration: selected.duration }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
+      return reply(200, { services: services.map(item => english ? { ...item, ...item.en } : item), slots: slots({ duration: selected.duration }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
     if (req.method === 'POST' && route === '/api/bookings') {
       if (!adminHash) return reply(503, { error: 'Online aanvragen zijn nog niet geopend.' });

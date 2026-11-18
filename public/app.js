@@ -1,3 +1,6 @@
+const english = document.documentElement.lang === 'en';
+let translations = {};
+const t = text => english ? translations[text] || text : text;
 const form = document.querySelector('#booking');
 const status = document.querySelector('#status');
 const button = form.querySelector('button');
@@ -8,7 +11,7 @@ function updateTimes() {
   button.disabled = !time.value;
 }
 async function load() {
-  const response = await fetch('/api/options?service=' + encodeURIComponent(service.value));
+  const response = await fetch('/api/options?lang=' + document.documentElement.lang + '&service=' + encodeURIComponent(service.value));
   if (!response.ok) throw new Error();
   const options = await response.json();
   slots = options.slots;
@@ -16,7 +19,7 @@ async function load() {
   const previousService = service.value;
   service.replaceChildren(...options.services.map(item => new Option(item.name + ' · €' + item.price + ' · ' + item.durationLabel, item.id)));
   if ([...service.options].some(option => option.value === previousService)) service.value = previousService;
-  const formatDay = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
+  const formatDay = new Intl.DateTimeFormat(english ? 'en-GB' : 'nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
   day.replaceChildren(...[...new Set(slots.map(slot => slot.day))].map(value => new Option(formatDay.format(new Date(value)), value)));
   if ([...day.options].some(option => option.value === previousDay)) day.value = previousDay;
   document.querySelector('#services').replaceChildren(...options.services.map(item => {
@@ -31,7 +34,7 @@ async function load() {
     price.textContent = '€' + item.price + ' · ' + item.durationLabel;
     const choose = document.createElement('button');
     choose.type = 'button';
-    choose.textContent = 'Kies ' + item.name.toLowerCase();
+    choose.textContent = t("Kies ") + item.name.toLowerCase();
     choose.addEventListener('click', () => {
       service.value = item.id;
       changeService();
@@ -51,8 +54,8 @@ function updateWhatsApp() {
   const bookingLink = document.querySelector('#whatsapp');
   const treatment = service.selectedOptions[0]?.textContent;
   const message = treatment
-    ? 'Hallo Olena, ik wil graag meer weten over de behandeling ' + treatment + '.'
-    : 'Hallo Olena, ik heb een vraag over de behandelingen.';
+    ? t("Hallo Olena, ik wil graag meer weten over de behandeling ") + treatment + '.'
+    : t("Hallo Olena, ik heb een vraag over de behandelingen.");
   const url = new URL(contact.href);
   url.searchParams.set('text', message);
   bookingLink.href = url.href;
@@ -64,19 +67,19 @@ async function changeService() {
   button.disabled = true;
   time.replaceChildren();
   try {
-    const response = await fetch('/api/options?service=' + encodeURIComponent(service.value));
+    const response = await fetch('/api/options?lang=' + document.documentElement.lang + '&service=' + encodeURIComponent(service.value));
     if (!response.ok) throw new Error();
     const options = await response.json();
     if (requestId !== availabilityRequest) return;
     slots = options.slots;
     const previous = day.value;
-    const formatDay = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
+    const formatDay = new Intl.DateTimeFormat(english ? 'en-GB' : 'nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
     day.replaceChildren(...[...new Set(slots.map(slot => slot.day))].map(value => new Option(formatDay.format(new Date(value)), value)));
     if ([...day.options].some(option => option.value === previous)) day.value = previous;
     updateTimes();
-    status.textContent = slots.length ? '' : 'Geen beschikbare tijden voor deze behandeling.';
+    status.textContent = slots.length ? '' : t("Geen beschikbare tijden voor deze behandeling.");
   } catch {
-    if (requestId === availabilityRequest) status.textContent = 'Beschikbaarheid laden lukt momenteel niet.';
+    if (requestId === availabilityRequest) status.textContent = t("Beschikbaarheid laden lukt momenteel niet.");
   }
 }
 service.addEventListener('change', changeService);
@@ -84,14 +87,14 @@ day.addEventListener('change', updateTimes);
 form.addEventListener('submit', async event => {
   event.preventDefault();
   button.disabled = true;
-  status.textContent = 'Aanvraag versturen…';
+  status.textContent = t("Aanvraag versturen…");
   try {
-    const response = await fetch('/api/bookings', {
+    const response = await fetch('/api/bookings?lang=' + document.documentElement.lang, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Olena-Request': '1' },
       body: JSON.stringify(Object.fromEntries(new FormData(form))),
     });
     const result = await response.json();
-    status.textContent = response.ok ? 'Je aanvraag is ontvangen. Olena neemt contact met je op.' : result.error;
+    status.textContent = response.ok ? t("Je aanvraag is ontvangen. Olena neemt contact met je op.") : result.error;
     if (response.ok) {
       form.elements.name.value = '';
       form.elements.email.value = '';
@@ -99,14 +102,17 @@ form.addEventListener('submit', async event => {
     if (response.ok || response.status === 409) await load().catch(() => {
       slots = [];
       time.replaceChildren();
-      status.textContent += ' Vernieuw de pagina om de beschikbare tijden te zien.';
+      status.textContent += t(" Vernieuw de pagina om de beschikbare tijden te zien.");
     });
   } catch {
-    status.textContent = 'De aanvraag kon niet worden gecontroleerd. Vernieuw de pagina om de beschikbare tijden te zien.';
+    status.textContent = t("De aanvraag kon niet worden gecontroleerd. Vernieuw de pagina om de beschikbare tijden te zien.");
   } finally {
     button.disabled = !time.value;
   }
 });
-load().then(() => {
-  if (!slots.length) status.textContent = 'Er zijn momenteel geen tijdsloten beschikbaar.';
-}).catch(() => { status.textContent = 'Beschikbaarheid laden lukt momenteel niet.'; });
+(english ? fetch('/translations.json').then(response => {
+  if (!response.ok) throw new Error();
+  return response.json();
+}).then(value => { translations = value; }) : Promise.resolve()).then(load).then(() => {
+  if (!slots.length) status.textContent = t("Er zijn momenteel geen tijdsloten beschikbaar.");
+}).catch(() => { status.textContent = t("Beschikbaarheid laden lukt momenteel niet."); });
