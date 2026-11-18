@@ -40,5 +40,10 @@
   "Ongeldig verzoek.": "Invalid request.",
   "Controleer je naam, e-mailadres en behandeling.": "Please check your name, email address and treatment.",
   "Dit tijdslot is niet meer beschikbaar.": "This appointment time is no longer available.",
-  "Er ging iets mis. Probeer het opnieuw.": "Something went wrong. Please try again."
+  "Er ging iets mis. Probeer het opnieuw.": "Something went wrong. Please try again.",
+  "Beheer is nog niet ingesteld.": "Administration has not been configured yet.",
+  "Log in om afspraken te beheren.": "Sign in to manage appointments.",
+  "Kies een datum en tijdslot.": "Choose a date and time slot.",
+  "Dit tijdslot is al bezet of geblokkeerd.": "This time slot is already occupied or blocked.",
+  "Deze aanvraag is al verwerkt of bestaat niet.": "This request has already been processed or no longer exists."
 }

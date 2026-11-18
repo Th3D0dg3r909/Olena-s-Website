@@ -153,7 +153,10 @@ createServer(async (req, res) => {
 
     if (req.method === 'GET' && route === '/api/admin/bookings') {
       return reply(200, db.prepare('SELECT * FROM bookings ORDER BY day DESC,time DESC').all()
-        .map(booking => ({ ...booking, service: services.find(service => service.id === booking.service)?.name || booking.service })));
+        .map(booking => {
+          const service = services.find(service => service.id === booking.service);
+          return { ...booking, service: (english ? service?.en.name : service?.name) || booking.service };
+        }));
     }
     if (req.method === 'PATCH' && route === '/api/admin/bookings') {
       const body = await readBody(req).catch(() => null);

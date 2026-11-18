@@ -1,8 +1,8 @@
 const status = document.querySelector('#status');
 const list = document.querySelector('#bookings');
-const labels = { pending: 'In behandeling', confirmed: 'Bevestigd', declined: 'Afgewezen' };
+const labels = { pending: 'Pending', confirmed: 'Confirmed', declined: 'Declined' };
 async function request(method, body, endpoint = 'bookings') {
-  const response = await fetch('/api/admin/' + endpoint, {
+  const response = await fetch('/api/admin/' + endpoint + '?lang=en', {
     method,
     headers: { 'Content-Type': 'application/json', 'X-Olena-Request': '1' },
     body: JSON.stringify(body),
@@ -24,7 +24,7 @@ async function load() {
 }
 function render() {
   const day = date.value;
-  document.querySelector('#selected-day').textContent = day ? dayFormat.format(new Date(day)) : 'Kies een datum';
+  document.querySelector('#selected-day').textContent = day ? dayFormat.format(new Date(day)) : 'Choose a date';
   const dailyBookings = bookings.filter(booking => booking.day === day).sort((a, b) => a.time.localeCompare(b.time));
   schedule.replaceChildren();
   const slots = [
@@ -39,14 +39,14 @@ function render() {
     time.textContent = slot.time;
     const badge = document.createElement('span');
     badge.className = 'planner-badge ' + (slot.blocked ? 'blocked' : 'free');
-    badge.textContent = slot.blocked ? 'Geblokkeerd' : 'Vrij';
-    button.textContent = slot.blocked ? 'Vrijgeven' : 'Blokkeren';
-    button.setAttribute('aria-label', button.textContent + ' om ' + slot.time);
+    badge.textContent = slot.blocked ? 'Blocked' : 'Available';
+    button.textContent = slot.blocked ? 'Unblock' : 'Block';
+    button.setAttribute('aria-label', button.textContent + ' at ' + slot.time);
     button.addEventListener('click', async () => {
       button.disabled = true;
       try {
         await request('PATCH', { ...slot, blocked: !slot.blocked }, 'planning');
-        planningStatus.textContent = slot.blocked ? 'Tijdslot vrijgegeven.' : 'Tijdslot geblokkeerd.';
+        planningStatus.textContent = slot.blocked ? 'Time slot unblocked.' : 'Time slot blocked.';
         await load();
       } catch (error) {
         planningStatus.textContent = error.message;
@@ -57,7 +57,7 @@ function render() {
     row.append(time, badge, button);
     schedule.append(row);
   }
-  if (!slots.length) schedule.textContent = 'Geen vrije of geblokkeerde tijdsloten voor deze datum.';
+  if (!slots.length) schedule.textContent = 'No available or blocked time slots for this date.';
 
   list.replaceChildren(...dailyBookings.map(booking => {
     const card = document.createElement('article');
@@ -74,14 +74,14 @@ function render() {
     card.append(badge, heading, details, email);
     if (booking.status === 'pending') {
       const actions = document.createElement('div');
-      for (const [next, label] of [['confirmed', 'Bevestigen'], ['declined', 'Afwijzen']]) {
+      for (const [next, label] of [['confirmed', 'Confirm'], ['declined', 'Decline']]) {
         const button = document.createElement('button');
         button.textContent = label;
         button.addEventListener('click', async () => {
           for (const control of actions.children) control.disabled = true;
           try {
             await request('PATCH', { id: booking.id, status: next });
-            status.textContent = 'Aanvraag bijgewerkt.';
+            status.textContent = 'Request updated.';
             await load();
           } catch (error) {
             status.textContent = error.message;
@@ -94,9 +94,9 @@ function render() {
     }
     return card;
   }));
-  if (!dailyBookings.length) list.textContent = 'Geen aanvragen of afspraken op deze datum.';
+  if (!dailyBookings.length) list.textContent = 'No requests or appointments on this date.';
 }
-const dayFormat = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
+const dayFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeZone: 'UTC' });
 for (const button of document.querySelectorAll('[data-step]')) {
   button.addEventListener('click', () => {
     if (!planning) return;
