@@ -5,19 +5,24 @@
 <title>Planning | Olena Skin Care Studio</title>
 <link rel="stylesheet" href="/style.css"><script defer src="/admin.js"></script>
 </head>
-<body class="planner">
+<body class="planner salon-planner">
 <header><a class="brand" href="/?lang=en">Olena <span>Skin Care Studio</span></a><a href="/?lang=en">View website ↗</a></header>
 <main>
-<h1>Planning</h1>
+<h1>Calendar</h1><p class="calendar-subtitle">Manage appointments and studio availability.</p>
 <div class="planner-toolbar">
 <h2 id="selected-day"></h2>
 <div class="planner-controls">
-<button type="button" data-step="-1" aria-label="Previous day">←</button>
+<button type="button" data-step="-1" aria-label="Previous period">←</button>
 <button type="button" id="today">Today</button>
-<button type="button" data-step="1" aria-label="Next day">→</button>
-<input id="planning-day" type="date" aria-label="Choose a date" required>
+<button type="button" data-step="1" aria-label="Next period">→</button>
+<select id="calendar-view" aria-label="Calendar view"><option value="week">Week</option><option value="day">Day</option></select><input id="planning-day" type="date" aria-label="Choose a date" required>
 </div>
 </div>
+<div class="calendar-legend" aria-label="Appointment statuses"><span class="planner-badge pending">Pending</span><span class="planner-badge confirmed">Confirmed</span><span class="planner-badge blocked">Blocked</span></div>
+<div class="calendar-layout">
+<section class="calendar-panel" aria-label="Appointment calendar"><div class="calendar-scroll"><div id="calendar"></div></div></section>
+<aside class="day-sidebar">
+<h2 id="sidebar-date"></h2>
 <div class="planner-grid">
 <section aria-labelledby="slots-title">
 <h2 id="slots-title">Availability</h2>
@@ -30,7 +35,7 @@
 <p id="status" role="status"></p>
 <div id="bookings"></div>
 </section>
-</div>
+</div></aside></div>
 </main>
 </body>
 </html>
