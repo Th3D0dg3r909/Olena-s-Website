@@ -65,7 +65,7 @@ function render() {
     const details = document.createElement('p');
     const email = document.createElement('a');
     heading.textContent = booking.service;
-    details.textContent = [booking.time, booking.name].join(' · ');
+    details.textContent = [booking.time, booking.duration + ' min', booking.name].join(' · ');
     const badge = document.createElement('span');
     badge.className = 'planner-badge ' + booking.status;
     badge.textContent = labels[booking.status];

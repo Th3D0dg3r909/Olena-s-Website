@@ -1,0 +1,380 @@
+[
+  {
+    "category": "REINIGING & VERNIEUWING",
+    "name": "Dieptereiniging & Hydratatie",
+    "description": "Hydrodermabrasie voor diepe reiniging en milde exfoliatie, met speciale serums afgestemd op jouw huidtype; gevolgd door hydratatie en verkoelende verzorging (ZEMITS DermoLuxx Pro; cryotherapie)",
+    "price": 120,
+    "durationLabel": "90 min",
+    "duration": 90,
+    "id": "treatment-1",
+    "en": {
+      "category": "CLEANSING & RENEWAL",
+      "name": "Deep Cleansing & Hydration Facial",
+      "description": "Hydrodermabrasion for deep cleansing and gentle exfoliation, using specialised serums tailored to specific skin type followed by hydration and cooling care (ZEMITS DermoLuxx Pro; cryotherapy)"
+    }
+  },
+  {
+    "category": "REINIGING & VERNIEUWING",
+    "name": "Dieptereiniging Gezicht",
+    "description": "Grondige manuele reiniging, afgestemd op jouw huid, gevolgd door kalmerende verzorging",
+    "price": 100,
+    "durationLabel": "120 min",
+    "duration": 120,
+    "id": "treatment-2",
+    "en": {
+      "category": "CLEANSING & RENEWAL",
+      "name": "Deep Cleansing Facial",
+      "description": "Thorough manual cleansing tailored to your skin, followed by soothing care"
+    }
+  },
+  {
+    "category": "REINIGING & VERNIEUWING",
+    "name": "Dieptereiniging Rug",
+    "description": "Grondige reiniging van de rug, gevolgd door kalmerende verzorging",
+    "price": 110,
+    "durationLabel": "120 min",
+    "duration": 120,
+    "id": "treatment-3",
+    "en": {
+      "category": "CLEANSING & RENEWAL",
+      "name": "Back Cleansing Treatment",
+      "description": "Thorough cleansing of the back, followed by calming finishing care"
+    }
+  },
+  {
+    "category": "GEZICHTSVERZORGING & MASSAGE",
+    "name": "Anti-aging Gezichtsbehandeling & Massage",
+    "description": "Een ontspannende gezichtsbehandeling met massage van gezicht, hals en decolleté (klassieke massage en lymfedrainage)",
+    "price": 100,
+    "durationLabel": "115 min",
+    "duration": 115,
+    "id": "treatment-4",
+    "en": {
+      "category": "FACIAL CARE & MASSAGE",
+      "name": "Anti-Ageing Facial & Massage",
+      "description": "A relaxing facial with massage of the face, neck and décolleté (classic massage and lymphatic drainage techniques)"
+    }
+  },
+  {
+    "category": "GEZICHTSVERZORGING & MASSAGE",
+    "name": "Verhelderende & Hydraterende Behandeling",
+    "description": "Hydraterende en verhelderende verzorging voor een stralendere huid en minder zichtbare pigmentvlekken",
+    "price": 100,
+    "durationLabel": "115 min",
+    "duration": 115,
+    "id": "treatment-5",
+    "en": {
+      "category": "FACIAL CARE & MASSAGE",
+      "name": "Brightening & Hydrating Facial",
+      "description": "Hydrating and brightening care to improve skin radiance and reduce the appearance of uneven pigmentation"
+    }
+  },
+  {
+    "category": "GEZICHTSVERZORGING & MASSAGE",
+    "name": "Verstevigende Verzorging & WOW-masker",
+    "description": "Gezichtsverzorging met massage van gezicht, hals, decolleté en handen (HYALUAL WOW Lift Mask) + LED-therapie",
+    "price": 110,
+    "durationLabel": "115 min",
+    "duration": 115,
+    "id": "treatment-6",
+    "en": {
+      "category": "FACIAL CARE & MASSAGE",
+      "name": "Firming Facial & WOW Mask",
+      "description": "Facial care with massage of the face, neck, décolleté and hands (HYALUAL WOW Lift Mask) + LED Therapy"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Intensieve Hydratatie",
+    "description": "Intensief hydraterende verzorging voor een vochtarme huid (FR-HAUT HY+)",
+    "price": 100,
+    "durationLabel": "100 min",
+    "duration": 100,
+    "id": "treatment-7",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "Deep Hydration Facial",
+      "description": "Intensive hydrating care for dehydrated skin (FR-HAUT HY+)"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Kalmerende Verzorging bij Roodheid",
+    "description": "Zachte, kalmerende verzorging voor een huid die snel rood of gevoelig wordt (FR-HAUT OxygenO2) + LED-therapie",
+    "price": 100,
+    "durationLabel": "100 min",
+    "duration": 100,
+    "id": "treatment-8",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "Calming Facial for Redness-Prone Skin",
+      "description": "Gentle, soothing care for skin prone to redness and sensitivity (FR-HAUT OxygenO2) + LED Therapy"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Verstevigende & Revitaliserende Behandeling",
+    "description": "Revitaliserende verzorging met een milde oppervlakkige peeling voor een verfijndere huidstructuur (FR-HAUT White Tea)",
+    "price": 110,
+    "durationLabel": "100 min",
+    "duration": 100,
+    "id": "treatment-9",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "Firming & Revitalising Facial",
+      "description": "Revitalising care with a gentle superficial peel to refine the appearance of skin texture (FR-HAUT White Tea)"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Vitamine C Glow-behandeling",
+    "description": "Antioxidantverzorging voor een frissere uitstraling en een stralendere huid (FR-HAUT Citrus Care; vitamine C)",
+    "price": 100,
+    "durationLabel": "90 min",
+    "duration": 90,
+    "id": "treatment-10",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "Vitamin C Radiance Facial",
+      "description": "Antioxidant care to refresh dull-looking skin and enhance radiance (FR-HAUT Citrus Care; vitamin C)"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Zachte Carboxytherapie",
+    "description": "Kalmerende carboxytherapie voor de gevoelige huid (Amber-Carelika)+ LED-therapie",
+    "price": 90,
+    "durationLabel": "75 min",
+    "duration": 75,
+    "id": "treatment-11",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "Gentle Carboxy Facial",
+      "description": "Comfort-focused carboxytherapy for sensitive skin (Amber-Carelika) + LED Therapy"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Balansherstellende Carboxytherapie",
+    "description": "Carboxytherapie voor de normale, gemengde en vette huid (Renew) + LED-therapie",
+    "price": 90,
+    "durationLabel": "75 min",
+    "duration": 75,
+    "id": "treatment-12",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "Balancing Carboxy Facial",
+      "description": "Carboxytherapy for normal, combination and oily skin (Renew) + LED Therapy"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Bio-enzymbehandeling",
+    "description": "Enzymatische exfoliatie voor een gladdere, frissere huid (Renew BioEnzyme Therapy)",
+    "price": 95,
+    "durationLabel": "90 min",
+    "duration": 90,
+    "id": "treatment-13",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "BioEnzyme Renewal Facial",
+      "description": "Enzyme-based exfoliation for smoother, fresher-looking skin (Renew BioEnzyme Therapy)"
+    }
+  },
+  {
+    "category": "HUIDVERZORGING OP MAAT",
+    "name": "Enzymbehandeling",
+    "description": "Milde enzymatische exfoliatie met afsluitende kalmerende verzorging (Smart 4 Derma) + LED-therapie",
+    "price": 90,
+    "durationLabel": "75 min",
+    "duration": 75,
+    "id": "treatment-14",
+    "en": {
+      "category": "PERSONALISED SKIN CARE",
+      "name": "Enzyme Renewal Facial",
+      "description": "Gentle enzyme exfoliation and soothing finishing care (Smart 4 Derma) + LED Therapy"
+    }
+  },
+  {
+    "category": "INTENSIEVE HUIDBEHANDELINGEN",
+    "name": "Microneedling - Gezicht",
+    "description": "Microneedling voor het verbeteren van de zichtbare huidstructuur en teint (microneedling-pen)",
+    "price": 115,
+    "durationLabel": "60 min",
+    "duration": 60,
+    "id": "treatment-15",
+    "en": {
+      "category": "ADVANCED SKIN TREATMENTS",
+      "name": "Microneedling - Face",
+      "description": "Microneedling to improve the appearance of skin texture and tone (microneedling pen)"
+    }
+  },
+  {
+    "category": "INTENSIEVE HUIDBEHANDELINGEN",
+    "name": "Microneedling - Gezicht & Hals",
+    "description": "Microneedling voor gezicht en hals, gericht op huidstructuur en teint (microneedling-pen)",
+    "price": 145,
+    "durationLabel": "75 min",
+    "duration": 75,
+    "id": "treatment-16",
+    "en": {
+      "category": "ADVANCED SKIN TREATMENTS",
+      "name": "Microneedling - Face & Neck",
+      "description": "Microneedling for the face and neck, focused on skin texture and tone (microneedling pen)"
+    }
+  },
+  {
+    "category": "INTENSIEVE HUIDBEHANDELINGEN",
+    "name": "Microneedling - Gezicht, Hals & Decolleté",
+    "description": "Microneedling van drie behandelzones (microneedling-pen)",
+    "price": 175,
+    "durationLabel": "90 min",
+    "duration": 90,
+    "id": "treatment-17",
+    "en": {
+      "category": "ADVANCED SKIN TREATMENTS",
+      "name": "Microneedling - Face, Neck & Décolleté",
+      "description": "Microneedling for three treatment areas (microneedling pen)"
+    }
+  },
+  {
+    "category": "PROFESSIONELE PEELINGS",
+    "name": "PRX-T33 Gezichtspeeling",
+    "description": "Professionele peeling voor een frissere uitstraling en een gladdere huid (PRX-T33)",
+    "price": 110,
+    "durationLabel": "30-40 min",
+    "duration": 40,
+    "id": "treatment-18",
+    "en": {
+      "category": "PROFESSIONAL PEELS",
+      "name": "PRX-T33 Facial Peel",
+      "description": "Professional facial peel for refreshed, smoother-looking skin (PRX-T33)"
+    }
+  },
+  {
+    "category": "PROFESSIONELE PEELINGS",
+    "name": "BioRePeel Gezichtspeeling",
+    "description": "Exfoliërende peeling voor een verbeterde huidstructuur en een frisse uitstraling (BioRePeelCl3)",
+    "price": 100,
+    "durationLabel": "30 min",
+    "duration": 30,
+    "id": "treatment-19",
+    "en": {
+      "category": "PROFESSIONAL PEELS",
+      "name": "BioRePeel Facial Peel",
+      "description": "Exfoliating facial peel to refresh skin texture and radiance (BioRePeelCl3)"
+    }
+  },
+  {
+    "category": "PROFESSIONELE PEELINGS",
+    "name": "Esabiopeel Vernieuwende Peeling",
+    "description": "Professionele exfoliërende verzorging voor een gladdere en egalere teint (Esabiopeel)",
+    "price": 90,
+    "durationLabel": "30 min",
+    "duration": 30,
+    "id": "treatment-20",
+    "en": {
+      "category": "PROFESSIONAL PEELS",
+      "name": "Esabiopeel Renewal Peel",
+      "description": "Professional exfoliating care for a smoother, more even-looking complexion (Esabiopeel)"
+    }
+  },
+  {
+    "category": "PROFESSIONELE PEELINGS",
+    "name": "ENERPEEL Professionele Peeling",
+    "description": "Peeling afgestemd op jouw huid en de behandelzone (Mandelac, Jessner, Neck of Salicylic SA-15)",
+    "price": 80,
+    "durationLabel": "30 min",
+    "duration": 30,
+    "id": "treatment-21",
+    "en": {
+      "category": "PROFESSIONAL PEELS",
+      "name": "ENERPEEL Professional Peel",
+      "description": "Peel formula selected for your skin and treatment area (Mandelac, Jessner, Neck or Salicylic SA-15)"
+    }
+  },
+  {
+    "category": "PROFESSIONELE PEELINGS",
+    "name": "Pompoenpeeling & Verzorging",
+    "description": "Exfoliërende gezichtsbehandeling met een pompoenpeeling en afsluitende verzorging (Pumpkin Peeling)",
+    "price": 90,
+    "durationLabel": "60-75 min",
+    "duration": 75,
+    "id": "treatment-22",
+    "en": {
+      "category": "PROFESSIONAL PEELS",
+      "name": "Pumpkin Renewal Facial",
+      "description": "Exfoliating facial with a pumpkin-based peel and finishing care (Pumpkin Peeling)"
+    }
+  },
+  {
+    "category": "WENKBRAUWEN & WIMPERS",
+    "name": "Wenkbrauwen of Wimpers Verven",
+    "description": "Kleurbehandeling voor wenkbrauwen of wimpers",
+    "price": 25,
+    "durationLabel": "25 min",
+    "duration": 25,
+    "id": "treatment-23",
+    "en": {
+      "category": "BROWS & LASHES",
+      "name": "Eyebrow or Eyelash Tinting",
+      "description": "Colour enhancement for brows or lashes"
+    }
+  },
+  {
+    "category": "WENKBRAUWEN & WIMPERS",
+    "name": "Wenkbrauwen Epileren",
+    "description": "Wenkbrauwen nauwkeurig in model brengen met een pincet",
+    "price": 25,
+    "durationLabel": "20 min",
+    "duration": 20,
+    "id": "treatment-24",
+    "en": {
+      "category": "BROWS & LASHES",
+      "name": "Eyebrow Shaping",
+      "description": "Precise brow shaping with tweezers"
+    }
+  },
+  {
+    "category": "WENKBRAUWEN & WIMPERS",
+    "name": "Wenkbrauwen Epileren & Verven",
+    "description": "Wenkbrauwen epileren en verven in één afspraak",
+    "price": 40,
+    "durationLabel": "35 min",
+    "duration": 35,
+    "id": "treatment-25",
+    "en": {
+      "category": "BROWS & LASHES",
+      "name": "Eyebrow Shaping & Tinting",
+      "description": "Brow shaping and tinting in one appointment"
+    }
+  },
+  {
+    "category": "WENKBRAUWEN & WIMPERS",
+    "name": "Complete Wenkbrauw- & Wimperbehandeling",
+    "description": "Wenkbrauwen epileren en verven, inclusief het verven van de wimpers",
+    "price": 50,
+    "durationLabel": "50 min",
+    "duration": 50,
+    "id": "treatment-26",
+    "en": {
+      "category": "BROWS & LASHES",
+      "name": "Brow Shaping, Brow & Lash Tinting",
+      "description": "Complete brow and lash colour service"
+    }
+  },
+  {
+    "category": "KENNISMAKINGSAANBIEDING",
+    "name": "Kennismakingsbehandeling & Huidadvies",
+    "description": "Een gezichtsbehandeling op maat, inclusief een eerste huidanalyse en persoonlijk verzorgingsadvies. Introductietarief voor nieuwe klanten. Eenmalig per persoon.",
+    "price": 75,
+    "durationLabel": "60 min",
+    "duration": 60,
+    "id": "treatment-27",
+    "en": {
+      "category": "NEW CLIENT OFFER",
+      "name": "First Visit Facial & Skin Care Procedure",
+      "description": "A personalised facial with an initial skin consultation and individual skincare recommendations. Introductory price for first-time clients only. Available once per client."
+    }
+  }
+]

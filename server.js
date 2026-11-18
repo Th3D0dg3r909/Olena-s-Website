@@ -4,10 +4,7 @@ import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
-const services = [
-  { id: 'facial', name: 'Gezichtsbehandeling', description: 'Een verzorgingsmoment met aandacht voor jouw huid.' },
-  { id: 'intake', name: 'Huidconsult', description: 'Bespreek jouw huid en verzorgingsroutine met Olena.' },
-];
+const services = JSON.parse(readFileSync(new URL('./services.json', import.meta.url)));
 const path = process.env.DATABASE_PATH || './data/bookings.sqlite';
 mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
 const db = new DatabaseSync(path);
@@ -25,24 +22,39 @@ const local = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit',
   hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
 });
-function slots({ includeBlocked = false } = {}) {
+if (!db.prepare('PRAGMA table_info(bookings)').all().some(column => column.name === 'duration')) {
+  db.exec('ALTER TABLE bookings ADD COLUMN duration INTEGER NOT NULL DEFAULT 60');
+}
+const minutes = time => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
+function slots({ includeBlocked = false, duration = 60 } = {}) {
   const [today, now] = local.format(new Date()).split(' ');
   const date = new Date(today + 'T00:00:00Z');
-  const occupied = new Set(db.prepare("SELECT day,time FROM bookings WHERE day >= ? AND status != 'declined'").all(today)
-    .map(({ day, time }) => day + 'T' + time));
+  const occupied = db.prepare("SELECT day,time,duration FROM bookings WHERE day >= ? AND status != 'declined'").all(today);
   if (!includeBlocked) {
-    for (const { day, time } of db.prepare("SELECT day,time FROM blocked_slots WHERE day >= ?").all(today)) occupied.add(day + "T" + time);
+    occupied.push(...db.prepare('SELECT day,time,60 AS duration FROM blocked_slots WHERE day >= ?').all(today));
   }
   const result = [];
   for (let offset = 0; offset < 28; offset++, date.setUTCDate(date.getUTCDate() + 1)) {
     if ([0, 6].includes(date.getUTCDay())) continue;
     const day = date.toISOString().slice(0, 10);
-    for (let hour = 10; hour < 17; hour++) {
-      const time = hour + ':00';
-      if ((day !== today || time > now) && !occupied.has(day + 'T' + time)) result.push({ day, time });
+    for (let start = 600; start + duration <= 1020; start += 15) {
+      const time = String(Math.floor(start / 60)).padStart(2, '0') + ':' + String(start % 60).padStart(2, '0');
+      const overlap = occupied.some(item => item.day === day && start < minutes(item.time) + item.duration && start + duration > minutes(item.time));
+      if ((day !== today || time > now) && !overlap) result.push({ day, time });
     }
   }
   return result;
+}
+function transaction(action) {
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    const result = action();
+    db.exec('COMMIT');
+    return result;
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
 }
 const adminPassword = process.env.ADMIN_PASSWORD;
 if (adminPassword && adminPassword.length < 16) throw new Error('ADMIN_PASSWORD must be at least 16 characters.');
@@ -91,7 +103,9 @@ createServer(async (req, res) => {
     }
     if (req.method === 'GET' && route === '/api/options') {
       const whatsapp = process.env.WHATSAPP_NUMBER || '';
-      return reply(200, { services, slots: slots(), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
+      const serviceId = new URL(req.url, 'http://localhost').searchParams.get('service');
+      const selected = services.find(item => item.id === serviceId) || services[0];
+      return reply(200, { services, slots: slots({ duration: selected.duration }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
     if (req.method === 'POST' && route === '/api/bookings') {
       if (!adminHash) return reply(503, { error: 'Online aanvragen zijn nog niet geopend.' });
@@ -101,16 +115,20 @@ createServer(async (req, res) => {
       const email = typeof body.email === 'string' ? body.email.trim() : '';
       if (!name || name.length > 100 || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
           !services.some(service => service.id === body.service)) return reply(400, { error: 'Controleer je naam, e-mailadres en behandeling.' });
-      if (!slots().some(slot => slot.day === body.day && slot.time === body.time)) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
+      const selected = services.find(item => item.id === body.service);
       const id = randomUUID();
-      const result = db.prepare("INSERT INTO bookings SELECT ?,?,?,?,?,?,'pending' WHERE NOT EXISTS (SELECT 1 FROM blocked_slots WHERE day = ? AND time = ?) ON CONFLICT DO NOTHING")
-        .run(id, body.day, body.time, body.service, name, email, body.day, body.time);
-      if (!result.changes) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
+      const saved = transaction(() => {
+        if (!slots({ duration: selected.duration }).some(slot => slot.day === body.day && slot.time === body.time)) return false;
+        db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration) VALUES (?,?,?,?,?,?,'pending',?)")
+          .run(id, body.day, body.time, body.service, name, email, selected.duration);
+        return true;
+      });
+      if (!saved) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
       return reply(201, { id });
     }
     if (route === '/api/admin/planning' && req.method === 'GET') {
       const [today] = local.format(new Date()).split(' ');
-      return reply(200, { today, free: slots(), blocked: db.prepare('SELECT day,time FROM blocked_slots WHERE day >= ? ORDER BY day,time').all(today) });
+      return reply(200, { today, free: slots().filter(slot => slot.time.endsWith(':00')), blocked: db.prepare('SELECT day,time FROM blocked_slots WHERE day >= ? ORDER BY day,time').all(today) });
     }
     if (route === '/api/admin/planning' && req.method === 'PATCH') {
       const body = await readBody(req).catch(() => null);
@@ -121,14 +139,13 @@ createServer(async (req, res) => {
         db.prepare('DELETE FROM blocked_slots WHERE day = ? AND time = ?').run(body.day, body.time);
         return reply(200, { blocked: false });
       }
-      if (!slots({ includeBlocked: true }).some(slot => slot.day === body.day && slot.time === body.time)) {
-        return reply(409, { error: 'Dit tijdslot is niet vrij of ligt buiten de boekingsperiode.' });
-      }
-      const result = db.prepare(`INSERT INTO blocked_slots SELECT ?,? WHERE NOT EXISTS (
-        SELECT 1 FROM bookings WHERE day = ? AND time = ? AND status != 'declined'
-      ) ON CONFLICT DO NOTHING`).run(body.day, body.time, body.day, body.time);
-      return result.changes ? reply(200, { blocked: true }) : reply(409, { error: 'Dit tijdslot is al bezet of geblokkeerd.' });
+      const saved = transaction(() => {
+        if (!slots({ includeBlocked: true }).some(slot => slot.day === body.day && slot.time === body.time)) return false;
+        return db.prepare('INSERT INTO blocked_slots VALUES (?,?) ON CONFLICT DO NOTHING').run(body.day, body.time).changes;
+      });
+      return saved ? reply(200, { blocked: true }) : reply(409, { error: 'Dit tijdslot is al bezet of geblokkeerd.' });
     }
+
     if (req.method === 'GET' && route === '/api/admin/bookings') {
       return reply(200, db.prepare('SELECT * FROM bookings ORDER BY day DESC,time DESC').all()
         .map(booking => ({ ...booking, service: services.find(service => service.id === booking.service)?.name || booking.service })));

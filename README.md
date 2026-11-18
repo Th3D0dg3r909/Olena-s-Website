@@ -22,6 +22,6 @@ Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `
 
 ## Boekingen
 
-Een aanvraag reserveert het tijdslot. Afwijzen geeft het weer vrij. Bevestigingen en afwijzingen worden opgeslagen. Olena mailt klanten handmatig vanuit het beheer. Elke afspraak gebruikt één blok van een uur.
+Een aanvraag reserveert het tijdslot. Afwijzen geeft het weer vrij. Bevestigingen en afwijzingen worden opgeslagen. Olena mailt klanten handmatig vanuit het beheer. Elke afspraak reserveert de maximale behandelduur uit services.json. Starttijden zijn per kwartier beschikbaar. Geblokkeerde tijdsloten duren een uur. Bestaande boekingen van vóór deze wijziging behouden een duur van 60 minuten.
 
-Pas vóór publicatie de voorbeeldbehandelingen en beschikbaarheid in `server.js` aan. De testagenda toont eerstvolgende beschikbare tijden tot 28 dagen vooruit, maandag tot en met vrijdag van 10.00 tot 17.00 uur. Vul de echte prijzen, contactgegevens, beelden en privacytekst aan met Olena.
+De behandelingen en prijzen uit de aangeleverde Nederlandse en Engelse prijslijsten staan in `services.json`. De website toont de Nederlandse teksten. Pas vóór publicatie de beschikbaarheid in `server.js` aan. De testagenda toont eerstvolgende beschikbare tijden tot 28 dagen vooruit, maandag tot en met vrijdag van 10.00 tot 17.00 uur. Stem openingstijden, beelden en privacytekst af met Olena.

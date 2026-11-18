@@ -8,13 +8,13 @@ function updateTimes() {
   button.disabled = !time.value;
 }
 async function load() {
-  const response = await fetch('/api/options');
+  const response = await fetch('/api/options?service=' + encodeURIComponent(service.value));
   if (!response.ok) throw new Error();
   const options = await response.json();
   slots = options.slots;
   const previousDay = day.value;
   const previousService = service.value;
-  service.replaceChildren(...options.services.map(item => new Option(item.name, item.id)));
+  service.replaceChildren(...options.services.map(item => new Option(item.name + ' · €' + item.price + ' · ' + item.durationLabel, item.id)));
   if ([...service.options].some(option => option.value === previousService)) service.value = previousService;
   const formatDay = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
   day.replaceChildren(...[...new Set(slots.map(slot => slot.day))].map(value => new Option(formatDay.format(new Date(value)), value)));
@@ -25,16 +25,20 @@ async function load() {
     const description = document.createElement('p');
     heading.textContent = item.name;
     description.textContent = item.description;
+    const category = document.createElement('p');
+    category.textContent = item.category;
+    const price = document.createElement('strong');
+    price.textContent = '€' + item.price + ' · ' + item.durationLabel;
     const choose = document.createElement('button');
     choose.type = 'button';
     choose.textContent = 'Kies ' + item.name.toLowerCase();
     choose.addEventListener('click', () => {
       service.value = item.id;
-      updateWhatsApp();
+      changeService();
       window.location.hash = 'afspraak';
       day.focus({ preventScroll: true });
     });
-    card.append(heading, description, choose);
+    card.append(category, heading, description, price, choose);
     return card;
   }));
   const contact = document.querySelector('[data-whatsapp]');
@@ -53,7 +57,29 @@ function updateWhatsApp() {
   url.searchParams.set('text', message);
   bookingLink.href = url.href;
 }
-service.addEventListener('change', updateWhatsApp);
+let availabilityRequest = 0;
+async function changeService() {
+  updateWhatsApp();
+  const requestId = ++availabilityRequest;
+  button.disabled = true;
+  time.replaceChildren();
+  try {
+    const response = await fetch('/api/options?service=' + encodeURIComponent(service.value));
+    if (!response.ok) throw new Error();
+    const options = await response.json();
+    if (requestId !== availabilityRequest) return;
+    slots = options.slots;
+    const previous = day.value;
+    const formatDay = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
+    day.replaceChildren(...[...new Set(slots.map(slot => slot.day))].map(value => new Option(formatDay.format(new Date(value)), value)));
+    if ([...day.options].some(option => option.value === previous)) day.value = previous;
+    updateTimes();
+    status.textContent = slots.length ? '' : 'Geen beschikbare tijden voor deze behandeling.';
+  } catch {
+    if (requestId === availabilityRequest) status.textContent = 'Beschikbaarheid laden lukt momenteel niet.';
+  }
+}
+service.addEventListener('change', changeService);
 day.addEventListener('change', updateTimes);
 form.addEventListener('submit', async event => {
   event.preventDefault();
