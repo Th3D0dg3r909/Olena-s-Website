@@ -24,6 +24,7 @@ async function load() {
 }
 const view = document.querySelector('#calendar-view');
 const calendar = document.querySelector('#calendar');
+if (window.matchMedia('(max-width: 42rem)').matches) view.value = 'day';
 const shortDate = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
 function shiftDay(day, amount) {
   const next = new Date(day);
