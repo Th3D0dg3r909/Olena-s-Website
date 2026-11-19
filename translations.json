@@ -45,5 +45,10 @@
   "Log in om afspraken te beheren.": "Sign in to manage appointments.",
   "Kies een datum en tijdslot.": "Choose a date and time slot.",
   "Dit tijdslot is al bezet of geblokkeerd.": "This time slot is already occupied or blocked.",
-  "Deze aanvraag is al verwerkt of bestaat niet.": "This request has already been processed or no longer exists."
+  "Deze aanvraag is al verwerkt of bestaat niet.": "This request has already been processed or no longer exists.",
+  "Controleer je naam, telefoonnummer en behandeling.": "Please check your name, phone number and treatment.",
+  "Afspraak boeken…": "Booking appointment…",
+  "Je afspraak is bevestigd.": "Your appointment is confirmed.",
+  "Boekingsnummer": "Booking reference",
+  "We kunnen de boeking niet controleren. Bel Olena voordat je opnieuw boekt.": "We could not verify your booking. Call Olena before booking again."
 }

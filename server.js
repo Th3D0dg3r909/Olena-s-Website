@@ -26,6 +26,9 @@ const local = new Intl.DateTimeFormat('sv-SE', {
 if (!db.prepare('PRAGMA table_info(bookings)').all().some(column => column.name === 'duration')) {
   db.exec('ALTER TABLE bookings ADD COLUMN duration INTEGER NOT NULL DEFAULT 60');
 }
+if (!db.prepare('PRAGMA table_info(bookings)').all().some(column => column.name === 'phone')) {
+  db.exec("ALTER TABLE bookings ADD COLUMN phone TEXT NOT NULL DEFAULT ''");
+}
 const minutes = time => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
 function slots({ includeBlocked = false, duration = 60 } = {}) {
   const [today, now] = local.format(new Date()).split(' ');
@@ -36,9 +39,9 @@ function slots({ includeBlocked = false, duration = 60 } = {}) {
   }
   const result = [];
   for (let offset = 0; offset < 28; offset++, date.setUTCDate(date.getUTCDate() + 1)) {
-    if ([0, 6].includes(date.getUTCDay())) continue;
+    if (![2, 4, 6].includes(date.getUTCDay())) continue;
     const day = date.toISOString().slice(0, 10);
-    for (let start = 600; start + duration <= 1020; start += 15) {
+    for (let start = 600; start <= 1140 && start + duration <= 1260; start += 15) {
       const time = String(Math.floor(start / 60)).padStart(2, '0') + ':' + String(start % 60).padStart(2, '0');
       const overlap = occupied.some(item => item.day === day && start < minutes(item.time) + item.duration && start + duration > minutes(item.time));
       if ((day !== today || time > now) && !overlap) result.push({ day, time });
@@ -114,23 +117,23 @@ createServer(async (req, res) => {
       return reply(200, { services: services.map(item => english ? { ...item, ...item.en } : item), slots: slots({ duration: selected.duration }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
     if (req.method === 'POST' && route === '/api/bookings') {
-      if (!adminHash) return reply(503, { error: 'Online aanvragen zijn nog niet geopend.' });
       const body = await readBody(req).catch(() => null);
       if (!body) return reply(400, { error: 'Ongeldig verzoek.' });
       const name = typeof body.name === 'string' ? body.name.trim() : '';
-      const email = typeof body.email === 'string' ? body.email.trim() : '';
-      if (!name || name.length > 100 || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-          !services.some(service => service.id === body.service)) return reply(400, { error: 'Controleer je naam, e-mailadres en behandeling.' });
+      const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
+      const phoneDigits = phone.replace(/\D/g, '');
+      if (!name || name.length > 100 || phone.length > 30 || !/^\+?[0-9 ()\.\-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15 ||
+          !services.some(service => service.id === body.service)) return reply(400, { error: 'Controleer je naam, telefoonnummer en behandeling.' });
       const selected = services.find(item => item.id === body.service);
       const id = randomUUID();
       const saved = transaction(() => {
         if (!slots({ duration: selected.duration }).some(slot => slot.day === body.day && slot.time === body.time)) return false;
-        db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration) VALUES (?,?,?,?,?,?,'pending',?)")
-          .run(id, body.day, body.time, body.service, name, email, selected.duration);
+        db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration,phone) VALUES (?,?,?,?,?,?,'confirmed',?,?)")
+          .run(id, body.day, body.time, body.service, name, '', selected.duration, phone);
         return true;
       });
       if (!saved) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
-      return reply(201, { id });
+      return reply(201, { id, status: 'confirmed', day: body.day, time: body.time, duration: selected.duration });
     }
     if (route === '/api/admin/planning' && req.method === 'GET') {
       const [today] = local.format(new Date()).split(' ');
@@ -162,7 +165,7 @@ createServer(async (req, res) => {
     if (req.method === 'PATCH' && route === '/api/admin/bookings') {
       const body = await readBody(req).catch(() => null);
       if (!body || typeof body.id !== 'string' || !['confirmed','declined'].includes(body.status)) return reply(400, { error: 'Ongeldig verzoek.' });
-      const result = db.prepare("UPDATE bookings SET status = ? WHERE id = ? AND status = 'pending'").run(body.status, body.id);
+      const result = db.prepare("UPDATE bookings SET status = ? WHERE id = ? AND (status = 'pending' OR (status = 'confirmed' AND ? = 'declined'))").run(body.status, body.id, body.status);
       return result.changes ? reply(200, { status: body.status }) : reply(409, { error: 'Deze aanvraag is al verwerkt of bestaat niet.' });
     }
     return reply(404, { error: 'Pagina niet gevonden.' });

@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
 </head>
 <body class="studio">
-<header><a class="brand" href="/"><img class="brand-logo" src="/logo.png" alt="Olena Skin Care Studio" width="922" height="1152"></a><nav aria-label="Hoofdnavigatie"><a href="#studio">De studio</a><a href="#behandelingen">Behandelingen</a><a class="nav-book" href="#afspraak">Afspraak aanvragen</a><a href="#contact">Contact</a><a href="/?lang=en" lang="en" aria-label="Switch to English">English</a></nav></header>
+<header><a class="brand" href="/"><img class="brand-logo" src="/logo.png" alt="Olena Skin Care Studio" width="922" height="1152"></a><nav aria-label="Hoofdnavigatie"><a href="#studio">De studio</a><a href="#behandelingen">Behandelingen</a><a class="nav-book" href="#afspraak">Afspraak boeken</a><a href="#contact">Contact</a><a href="/?lang=en" lang="en" aria-label="Switch to English">English</a></nav></header>
 <main>
 <section class="hero" aria-labelledby="hero-title">
 <figure class="hero-photo"><img src="/studio.webp" alt="" fetchpriority="high"><figcaption>Sfeerbeeld</figcaption></figure>
@@ -15,7 +15,7 @@
 <p class="location">Olena Skin Care Studio · Leiden</p>
 <h1 id="hero-title">Alle aandacht<br>voor je huid.</h1>
 <p>Persoonlijke huidverzorging in het centrum van Leiden.</p>
-<div class="actions"><a class="button" href="#afspraak">Vraag een afspraak aan</a><a class="button secondary" href="#behandelingen">Bekijk behandelingen</a></div>
+<div class="actions"><a class="button" href="#afspraak">Boek een afspraak</a><a class="button secondary" href="#behandelingen">Bekijk behandelingen</a></div>
 </div>
 </section>
 <section id="studio" class="intro" aria-labelledby="studio-title">
@@ -28,20 +28,21 @@
 <h2>Behandelingen</h2><p>Bekijk de behandelingen, prijzen en behandeltijden.</p>
 <div class="cards" id="services"></div>
 </section>
-<section id="afspraak" class="booking-section"><div><h2>Vraag een afspraak aan</h2><p>Kies een behandeling en tijdslot. Olena beoordeelt je aanvraag en neemt contact met je op per e-mail.</p></div><div class="booking-panel">
+<section id="afspraak" class="booking-section"><div><h2>Boek een afspraak</h2><p>Kies een behandeling en tijdslot en vul je naam en telefoonnummer in. Je afspraak wordt direct bevestigd.</p></div><div class="booking-panel">
 <form id="booking">
 <label>Behandeling<select name="service" required></select></label>
 <label>Datum<select name="day" required></select></label>
 <label>Tijd (Nederlandse tijd)<select name="time" required></select></label>
 <label>Naam<input name="name" autocomplete="name" maxlength="100" required></label>
-<label>E-mailadres<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
-<p>Je naam en e-mailadres worden gebruikt om je afspraak af te handelen.</p>
-<button disabled>Aanvraag versturen</button>
+<label>Telefoonnummer<input name="phone" type="tel" autocomplete="tel" maxlength="30" required></label>
+<p>Je naam en telefoonnummer worden gebruikt voor je afspraak.</p>
+<button disabled>Afspraak boeken</button>
 </form><p id="status" role="status"></p><a id="whatsapp" href="https://wa.me/31647238444">Vraag naar deze behandeling via WhatsApp</a></div>
 </section>
 <section id="contact" aria-labelledby="contact-title">
 <h2 id="contact-title">Contact &amp; route</h2>
 <p>Olena Skin Care Studio<br>Doezastraat 31<br>2311 HA Leiden</p>
+<p>Dinsdag, donderdag en zaterdag · 10.00–21.00 uur<br>Laatste starttijd voor afspraken · 19.00 uur</p>
 <div class="actions"><a class="button" href="tel:+31647238444">Bel 06 47238444</a><a class="button secondary" data-whatsapp href="https://wa.me/31647238444">Stuur een WhatsApp</a>
 <a class="button secondary" href="https://www.google.com/maps/dir/?api=1&amp;destination=Doezastraat%2031%2C%202311%20HA%20Leiden">Plan je route</a></div>
 </section>

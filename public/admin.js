@@ -53,7 +53,7 @@ function renderCalendar() {
   spacer.className = 'calendar-heading';
   spacer.textContent = 'Time';
   axis.append(spacer);
-  for (let hour = 10; hour < 17; hour++) {
+  for (let hour = 10; hour < 21; hour++) {
     const label = document.createElement('div');
     label.className = 'calendar-hour-label';
     label.textContent = hour + ':00';
@@ -71,7 +71,7 @@ function renderCalendar() {
     header.addEventListener('click', () => selectDay(day));
     const timeline = document.createElement('div');
     timeline.className = 'calendar-timeline';
-    for (let hour = 10; hour < 17; hour++) {
+    for (let hour = 10; hour < 21; hour++) {
       const time = hour + ':00';
       const free = planning.free.some(slot => slot.day === day && slot.time === time);
       const cell = document.createElement('button');
@@ -95,7 +95,7 @@ function renderCalendar() {
     ];
     for (const entry of entries) {
       const offset = timeMinutes(entry.time) - 600;
-      const duration = Math.min(entry.duration, 420 - offset);
+      const duration = Math.min(entry.duration, 660 - offset);
       if (offset < 0 || duration <= 0) continue;
       const event = document.createElement('button');
       event.type = 'button';
@@ -162,21 +162,23 @@ function render() {
     card.tabIndex = -1;
     const heading = document.createElement('h3');
     const details = document.createElement('p');
-    const email = document.createElement('a');
+    const contact = document.createElement('a');
     heading.textContent = booking.service;
     details.textContent = [booking.time, booking.duration + ' min', booking.name].join(' · ');
     const badge = document.createElement('span');
     badge.className = 'planner-badge ' + booking.status;
     badge.textContent = labels[booking.status];
-    email.textContent = booking.email;
-    email.href = 'mailto:' + encodeURIComponent(booking.email);
-    card.append(badge, heading, details, email);
-    if (booking.status === 'pending') {
+    contact.textContent = booking.phone || booking.email || '';
+    contact.href = booking.phone ? 'tel:' + booking.phone.replace(/[^+0-9]/g, '') : 'mailto:' + encodeURIComponent(booking.email || '');
+    card.append(badge, heading, details);
+    if (contact.textContent) card.append(contact);
+    if (['pending', 'confirmed'].includes(booking.status)) {
       const actions = document.createElement('div');
-      for (const [next, label] of [['confirmed', 'Confirm'], ['declined', 'Decline']]) {
+      for (const [next, label] of (booking.status === 'pending' ? [['confirmed', 'Confirm'], ['declined', 'Decline']] : [['declined', 'Cancel appointment']])) {
         const button = document.createElement('button');
         button.textContent = label;
         button.addEventListener('click', async () => {
+          if (booking.status === 'confirmed' && !window.confirm('Cancel this appointment?')) return;
           for (const control of actions.children) control.disabled = true;
           try {
             await request('PATCH', { id: booking.id, status: next });

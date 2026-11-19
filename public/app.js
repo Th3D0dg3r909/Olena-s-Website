@@ -64,6 +64,7 @@ let availabilityRequest = 0;
 async function changeService() {
   updateWhatsApp();
   const requestId = ++availabilityRequest;
+  slots = [];
   button.disabled = true;
   time.replaceChildren();
   try {
@@ -87,17 +88,19 @@ day.addEventListener('change', updateTimes);
 form.addEventListener('submit', async event => {
   event.preventDefault();
   button.disabled = true;
-  status.textContent = t("Aanvraag versturen…");
+  status.textContent = t("Afspraak boeken…");
   try {
     const response = await fetch('/api/bookings?lang=' + document.documentElement.lang, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Olena-Request': '1' },
       body: JSON.stringify(Object.fromEntries(new FormData(form))),
     });
     const result = await response.json();
-    status.textContent = response.ok ? t("Je aanvraag is ontvangen. Olena neemt contact met je op.") : result.error;
+    status.textContent = response.ok
+      ? t("Je afspraak is bevestigd.") + ' ' + service.selectedOptions[0].textContent + ' · ' + day.selectedOptions[0].textContent + ' · ' + result.time + ' · ' + t("Boekingsnummer") + ' ' + result.id
+      : result.error;
     if (response.ok) {
       form.elements.name.value = '';
-      form.elements.email.value = '';
+      form.elements.phone.value = '';
     }
     if (response.ok || response.status === 409) await load().catch(() => {
       slots = [];
@@ -105,7 +108,7 @@ form.addEventListener('submit', async event => {
       status.textContent += t(" Vernieuw de pagina om de beschikbare tijden te zien.");
     });
   } catch {
-    status.textContent = t("De aanvraag kon niet worden gecontroleerd. Vernieuw de pagina om de beschikbare tijden te zien.");
+    status.textContent = t("We kunnen de boeking niet controleren. Bel Olena voordat je opnieuw boekt.");
   } finally {
     button.disabled = !time.value;
   }

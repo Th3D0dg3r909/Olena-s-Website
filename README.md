@@ -1,6 +1,6 @@
 # Olena Skin Care Studio
 
-Nederlandstalige Node.js-webapp voor een huidverzorgingsstudio in Leiden. Klanten vragen een tijdslot aan. Olena beheert de aanvragen via `/admin`.
+Nederlandstalige Node.js-webapp voor een huidverzorgingsstudio in Leiden. Klanten boeken direct met hun naam en telefoonnummer. Nieuwe afspraken worden automatisch bevestigd. Olena beheert de afspraken via `/admin`.
 
 ## Starten
 
@@ -10,7 +10,7 @@ Gebruik Node.js 24 of hoger. De app gebruikt de ingebouwde SQLite-module en heef
 ADMIN_PASSWORD='vervang-dit-door-een-lang-uniek-wachtwoord' npm start
 ```
 
-Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `ADMIN_PASSWORD` zijn aanvragen en beheer uitgeschakeld. Gebruik op hosting HTTPS en stel het wachtwoord in via de omgevingsvariabelen van de host.
+Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `ADMIN_PASSWORD` is beheer uitgeschakeld. Online boeken is beschikbaar zodra de app draait. Gebruik op hosting HTTPS en stel het wachtwoord in via de omgevingsvariabelen van de host.
 
 | Variabele | Gedrag |
 | --- | --- |
@@ -22,6 +22,10 @@ Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `
 
 ## Boekingen
 
-Een aanvraag reserveert het tijdslot. Afwijzen geeft het weer vrij. Bevestigingen en afwijzingen worden opgeslagen. Olena mailt klanten handmatig vanuit het beheer. Elke afspraak reserveert de maximale behandelduur uit services.json. Starttijden zijn per kwartier beschikbaar. Geblokkeerde tijdsloten duren een uur. Bestaande boekingen van vóór deze wijziging behouden een duur van 60 minuten.
+Een boeking wordt direct bevestigd en reserveert de maximale behandelduur uit services.json. Starttijden zijn per kwartier beschikbaar op dinsdag, donderdag en zaterdag tussen 10.00 en 19.00 uur. Behandelingen eindigen uiterlijk om 21.00 uur. Geblokkeerde tijdsloten duren een uur. Annuleren geeft de tijd weer vrij.
 
-De behandelingen en prijzen uit de aangeleverde Nederlandse en Engelse prijslijsten staan in `services.json`. De website toont de Nederlandse teksten. Pas vóór publicatie de beschikbaarheid in `server.js` aan. De testagenda toont eerstvolgende beschikbare tijden tot 28 dagen vooruit, maandag tot en met vrijdag van 10.00 tot 17.00 uur. Stem openingstijden, beelden en privacytekst af met Olena.
+De website vraagt naam en telefoonnummer. De bevestiging verschijnt direct op de website met boekingsnummer. Bestaande boekingen en e-mailadressen blijven in de database beschikbaar. Boekingen van vóór de duurmigratie behouden een duur van 60 minuten.
+
+De 27 behandelingen en hun Nederlandse en Engelse teksten staan in services.json. De website biedt beide talen. De beheerplanner gebruikt Engels. Het neutrale gegenereerde sfeerbeeld toont handdoeken en verzorgingsaccessoires.
+
+Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups. Stem de privacytekst af met Olena voordat klanten de website gebruiken.
