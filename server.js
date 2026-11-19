@@ -65,6 +65,7 @@ const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/index.en.html': ['index.en.html', 'text/html; charset=utf-8'],
   '/translations.json': ['../translations.json', 'application/json; charset=utf-8'],
+  '/logo.png': ['logo.png', 'image/png'],
   '/studio.webp': ['studio.webp', 'image/webp'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],

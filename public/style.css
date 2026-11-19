@@ -973,3 +973,16 @@ article button { margin: .2rem .5rem .2rem 0; }
 .duration-418{height:501.6px}
 .duration-419{height:502.8px}
 .duration-420{height:504.0px}
+
+.studio { --ink: #433125; --paper: #fff8f1; --green: #795132; --line: #e6d3be; }
+.studio header { background: #fcece3; }
+.studio .brand { display: flex; align-items: center; }
+.brand-logo { display: block; height: 92px; width: auto; }
+.studio-logo { display: block; width: 180px; height: auto; margin: 0 auto 1.5rem; border-radius: 1rem; }
+.studio .intro { background: #f9e9df; }
+.studio .booking-section { background: #f1e3d3; }
+.studio #behandelingen article { background: #fffaf5; border-color: #e2cdb3; border-radius: 1.1rem; }
+.studio .booking-panel { background: #fffaf5; border-radius: 1.1rem; }
+.studio input, .studio select { border-color: #b39472; border-radius: .65rem; }
+.studio .nav-book { border-color: #9b754b; }
+.studio footer { background: #493426; }
