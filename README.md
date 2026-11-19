@@ -32,4 +32,4 @@ Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups. Stem de privacytek
 
 ## Google reviews
 
-Set GOOGLE_PLACES_API_KEY and GOOGLE_PLACE_ID in Hostinger. Enable Places API (New) and billing in Google Cloud. Restrict the key to Places API (New) and, where hosting permits, its outbound IP. Reviews load on visitor request and are not stored in the database. Each load calls Google and may incur charges. Set an appropriate request quota in Google Cloud. Test the configured business before publishing.
+Set GOOGLE_PLACES_API_KEY and GOOGLE_PLACE_ID in Hostinger. Enable Places API (New) and billing in Google Cloud. Restrict the key to Places API (New) and, where hosting permits, its outbound IP. Reviews load automatically on page load and are not stored in the database. Each load calls Google and may incur charges. Set an appropriate request quota in Google Cloud. Test the configured business before publishing.

@@ -1472,3 +1472,14 @@ article button { margin: .2rem .5rem .2rem 0; }
 #google-reviews article p:first-child { display: flex; align-items: center; gap: .75rem; }
 #google-reviews img { border-radius: 50%; }
 .review-attribution { font-size: .8rem; }
+
+.studio #reviews { background: #f9eee4; }
+.review-summary { font-size: 1.15rem; color: #795132; font-weight: 600; }
+.review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.25rem; margin-block: 1.5rem; }
+#google-reviews .review-card { display: flex; flex-direction: column; margin: 0; padding: 1.5rem; background: #fffaf5; border: 1px solid #e2cdb3; border-radius: 1.1rem; box-shadow: 0 6px 24px #79513208; }
+.review-author { font-weight: 600; margin-top: 0; }
+.review-author a { text-decoration: none; }
+.review-stars { color: #886027; letter-spacing: .12em; margin: .25rem 0; }
+.review-text { flex: 1; line-height: 1.75; white-space: pre-line; overflow-wrap: anywhere; }
+.review-date { color: #716052; font-size: .85rem; }
+.review-card > a:last-child { font-size: .85rem; text-underline-offset: .2em; }
