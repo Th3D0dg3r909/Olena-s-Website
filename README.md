@@ -29,3 +29,7 @@ De website vraagt naam en telefoonnummer. De bevestiging verschijnt direct op de
 De 27 behandelingen en hun Nederlandse en Engelse teksten staan in services.json. De website biedt beide talen. De beheerplanner gebruikt Engels. Het neutrale gegenereerde sfeerbeeld toont handdoeken en verzorgingsaccessoires.
 
 Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups. Stem de privacytekst af met Olena voordat klanten de website gebruiken.
+
+## Google reviews
+
+Set GOOGLE_PLACES_API_KEY and GOOGLE_PLACE_ID in Hostinger. Enable Places API (New) and billing in Google Cloud. Restrict the key to Places API (New) and, where hosting permits, its outbound IP. Reviews load on visitor request and are not stored in the database. Each load calls Google and may incur charges. Set an appropriate request quota in Google Cloud. Test the configured business before publishing.

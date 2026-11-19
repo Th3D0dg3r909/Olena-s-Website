@@ -1467,3 +1467,8 @@ article button { margin: .2rem .5rem .2rem 0; }
 .duration-658{height:789.6px}
 .duration-659{height:790.8px}
 .duration-660{height:792.0px}
+
+#google-reviews article { margin-block: 1rem; }
+#google-reviews article p:first-child { display: flex; align-items: center; gap: .75rem; }
+#google-reviews img { border-radius: 50%; }
+.review-attribution { font-size: .8rem; }

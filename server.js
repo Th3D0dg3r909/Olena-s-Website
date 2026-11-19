@@ -1,3 +1,4 @@
+import { getReviews } from './reviews.js';
 import { createServer } from 'node:http';
 import { randomUUID, createHash, timingSafeEqual } from 'node:crypto';
 import { readFileSync, mkdirSync } from 'node:fs';
@@ -71,6 +72,7 @@ const assets = new Map(Object.entries({
   '/logo.png': ['logo.png', 'image/png'],
   '/studio.webp': ['studio.webp', 'image/webp'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
+  '/reviews.js': ['reviews.js', 'text/javascript; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/admin': ['admin.html', 'text/html; charset=utf-8'],
   '/admin.js': ['admin.js', 'text/javascript; charset=utf-8'],
@@ -87,7 +89,7 @@ async function readBody(req) {
   return value;
 }
 createServer(async (req, res) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' https://*.googleusercontent.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'no-store');
   const english = new URL(req.url, 'http://localhost').searchParams.get('lang') === 'en';
@@ -109,6 +111,14 @@ createServer(async (req, res) => {
       const [body, type] = assets.get(route === '/' && english ? '/index.en.html' : route);
       res.writeHead(200, { 'Content-Type': type });
       return res.end(body);
+    }
+    if (req.method === 'GET' && route === '/api/reviews') {
+      try {
+        const result = await getReviews(english ? 'en' : 'nl');
+        return reply(result.status, result.data);
+      } catch {
+        return reply(502, { error: 'Google reviews are temporarily unavailable.' });
+      }
     }
     if (req.method === 'GET' && route === '/api/options') {
       const whatsapp = process.env.WHATSAPP_NUMBER || '';
