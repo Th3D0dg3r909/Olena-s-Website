@@ -36,5 +36,10 @@
   "Boekingsnummer": "Номер запису",
   "We kunnen de boeking niet controleren. Bel Olena voordat je opnieuw boekt.": "Не вдалося перевірити ваш запис. Зателефонуйте Олені, перш ніж записуватися знову.",
   "Reviews are not connected yet.": "Відгуки ще не підключено.",
-  "Google reviews are temporarily unavailable.": "Відгуки Google тимчасово недоступні."
+  "Google reviews are temporarily unavailable.": "Відгуки Google тимчасово недоступні.",
+  "Beheer is nog niet ingesteld.": "Керування ще не налаштовано.",
+  "Log in om afspraken te beheren.": "Увійдіть, щоб керувати записами.",
+  "Kies een datum en tijdslot.": "Виберіть дату та час.",
+  "Dit tijdslot is al bezet of geblokkeerd.": "Цей час уже зайнято або заблоковано.",
+  "Deze aanvraag is al verwerkt of bestaat niet.": "Цей запис уже опрацьовано або він не існує."
 }

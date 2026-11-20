@@ -7,6 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 
 const translations = JSON.parse(readFileSync(new URL('./translations.json', import.meta.url)));
 const ukrainianTranslations = JSON.parse(readFileSync(new URL('./translations.uk.json', import.meta.url)));
+const plannerTranslations = JSON.parse(readFileSync(new URL('./planner-translations.json', import.meta.url)));
 const services = JSON.parse(readFileSync(new URL('./services.json', import.meta.url)));
 const path = process.env.DATABASE_PATH || './data/bookings.sqlite';
 mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
@@ -81,6 +82,7 @@ const assets = new Map(Object.entries({
   '/reviews.js': ['reviews.js', 'text/javascript; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/admin': ['admin.html', 'text/html; charset=utf-8'],
+  '/planner-translations.json': ['../planner-translations.json', 'application/json; charset=utf-8'],
   '/admin.js': ['admin.js', 'text/javascript; charset=utf-8'],
 }).map(([route, [file,type]]) => [route,[readFileSync(new URL('./public/' + file, import.meta.url)),type]]));
 async function readBody(req) {
@@ -99,7 +101,7 @@ createServer(async (req, res) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'no-store');
   const requestedLanguage = new URL(req.url, 'http://localhost').searchParams.get('lang');
-  const language = ['en', 'uk'].includes(requestedLanguage) ? requestedLanguage : 'nl';
+  const language = ['nl', 'en', 'uk'].includes(requestedLanguage) ? requestedLanguage : (req.url.split('?')[0] === '/admin' ? 'en' : 'nl');
   const english = language === 'en';
   const reply = (status, data) => {
     if (language !== 'nl' && data?.error) data = { ...data, error: (language === 'uk' ? ukrainianTranslations : translations)[data.error] || data.error };
@@ -118,6 +120,19 @@ createServer(async (req, res) => {
     if (req.method === 'GET' && assets.has(route)) {
       const [body, type] = assets.get(route === '/' && language !== 'nl' ? '/index.' + language + '.html' : route);
       res.writeHead(200, { 'Content-Type': type });
+      if (route === '/admin') {
+        let html = body.toString().replace('<html lang="en">', '<html lang="' + language + '">');
+        if (language !== 'en') {
+          const translations = plannerTranslations[language];
+          const pattern = Object.keys(translations).sort((a,b) => b.length - a.length)
+            .map(text => text.replace(/[.*+?^$\{\}()|[\]\\]/g, '\\$&')).join('|');
+          html = html.replace(new RegExp(pattern, 'g'), text => translations[text]);
+        }
+        html = html.replaceAll('href="/?lang=en"', 'href="/?lang=' + language + '"');
+        html = html.replaceAll(' aria-current="page"', '');
+        html = html.replace('href="/admin?lang=' + language + '"', 'aria-current="page" href="/admin?lang=' + language + '"');
+        return res.end(html);
+      }
       return res.end(body);
     }
     if (req.method === 'GET' && route === '/api/reviews') {
@@ -177,7 +192,7 @@ createServer(async (req, res) => {
       return reply(200, db.prepare('SELECT * FROM bookings ORDER BY day DESC,time DESC').all()
         .map(booking => {
           const service = services.find(service => service.id === booking.service);
-          return { ...booking, service: (english ? service?.en.name : service?.name) || booking.service };
+          return { ...booking, service: (language === 'nl' ? service?.name : service?.[language]?.name) || booking.service };
         }));
     }
     if (req.method === 'PATCH' && route === '/api/admin/bookings') {

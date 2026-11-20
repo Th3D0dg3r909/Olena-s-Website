@@ -1533,3 +1533,11 @@ input, select { max-width: 100%; min-width: 0; width: 100%; font-size: 1rem; }
   .studio .language-switch { width: fit-content; max-width: 100%; }
   .studio #studio-nav .language-switch a { padding: .4rem .6rem; }
 }
+
+.planner .language-switch { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem; border: 1px solid var(--line); border-radius: .8rem; padding: .2rem; }
+.planner .language-switch a { display: inline-flex; align-items: center; gap: .35rem; min-height: 44px; padding: .4rem .65rem; border-radius: .6rem; text-decoration: none; font-size: .85rem; }
+.planner .language-switch a[aria-current="page"] { color: #fffaf5; background: var(--green); }
+@media (max-width: 42rem) {
+  .planner .language-switch { max-width: 100%; }
+  .planner .language-switch a { padding-inline: .45rem; }
+}

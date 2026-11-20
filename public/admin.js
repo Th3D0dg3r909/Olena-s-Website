@@ -1,8 +1,18 @@
+async function initializePlanner() {
+const language = document.documentElement.lang;
+const locale = { nl: 'nl-NL', en: 'en-GB', uk: 'uk-UA' }[language];
+let dictionary = {};
+if (language !== 'en') {
+  const response = await fetch('/planner-translations.json');
+  if (!response.ok) throw new Error();
+  dictionary = (await response.json())[language] || {};
+}
+const t = text => dictionary[text] || text;
 const status = document.querySelector('#status');
 const list = document.querySelector('#bookings');
-const labels = { pending: 'Pending', confirmed: 'Confirmed', declined: 'Declined' };
+const labels = { pending: t("Pending"), confirmed: t("Confirmed"), declined: t("Declined") };
 async function request(method, body, endpoint = 'bookings') {
-  const response = await fetch('/api/admin/' + endpoint + '?lang=en', {
+  const response = await fetch('/api/admin/' + endpoint + '?lang=' + language, {
     method,
     headers: { 'Content-Type': 'application/json', 'X-Olena-Request': '1' },
     body: JSON.stringify(body),
@@ -19,13 +29,16 @@ let bookings = [];
 
 async function load() {
   [bookings, planning] = await Promise.all([request('GET'), request('GET', undefined, 'planning')]);
-  if (!date.value) date.value = planning.today;
+  if (!date.value) {
+    const selected = new URLSearchParams(window.location.search).get('day');
+    date.value = selected && /^\d{4}-\d{2}-\d{2}$/.test(selected) && !Number.isNaN(Date.parse(selected)) ? selected : planning.today;
+  }
   render();
 }
 const view = document.querySelector('#calendar-view');
 const calendar = document.querySelector('#calendar');
 if (window.matchMedia('(max-width: 42rem)').matches) view.value = 'day';
-const shortDate = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+const shortDate = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
 function shiftDay(day, amount) {
   const next = new Date(day);
   next.setUTCDate(next.getUTCDate() + amount);
@@ -52,7 +65,7 @@ function renderCalendar() {
   axis.className = 'calendar-axis';
   const spacer = document.createElement('div');
   spacer.className = 'calendar-heading';
-  spacer.textContent = 'Time';
+  spacer.textContent = t("Time");
   axis.append(spacer);
   for (let hour = 10; hour < 21; hour++) {
     const label = document.createElement('div');
@@ -79,12 +92,12 @@ function renderCalendar() {
       cell.type = 'button';
       cell.className = 'calendar-hour';
       cell.disabled = !free;
-      cell.setAttribute('aria-label', shortDate.format(new Date(day)) + ' ' + time + (free ? ', manage availability' : ', unavailable'));
+      cell.setAttribute('aria-label', shortDate.format(new Date(day)) + ' ' + time + (free ? t(", manage availability") : t(", unavailable")));
       if (free) {
         cell.textContent = '+';
         cell.addEventListener('click', () => {
           selectDay(day);
-          const control = [...schedule.querySelectorAll('button')].find(button => button.getAttribute('aria-label') === 'Block at ' + time);
+          const control = [...schedule.querySelectorAll('button')].find(button => button.getAttribute('aria-label') === t("Block") + t(" at ") + time);
           control?.focus();
         });
       }
@@ -92,7 +105,7 @@ function renderCalendar() {
     }
     const entries = [
       ...bookings.filter(booking => booking.day === day && booking.status !== 'declined'),
-      ...planning.blocked.filter(slot => slot.day === day).map(slot => ({ ...slot, duration: 60, status: 'blocked', name: 'Blocked' })),
+      ...planning.blocked.filter(slot => slot.day === day).map(slot => ({ ...slot, duration: 60, status: 'blocked', name: t("Blocked") })),
     ];
     for (const entry of entries) {
       const offset = timeMinutes(entry.time) - 600;
@@ -102,13 +115,13 @@ function renderCalendar() {
       event.type = 'button';
       event.className = 'calendar-event ' + entry.status + ' start-' + offset + ' duration-' + duration;
       event.textContent = entry.time + ' · ' + entry.name;
-      event.title = [entry.name, entry.service, entry.duration + ' min', labels[entry.status] || 'Blocked'].filter(Boolean).join(' · ');
+      event.title = [entry.name, entry.service, entry.duration + t(" min"), labels[entry.status] || t("Blocked")].filter(Boolean).join(' · ');
       event.setAttribute('aria-label', event.title);
       event.addEventListener('click', () => {
         selectDay(day);
         const target = entry.id
           ? [...list.querySelectorAll('article')].find(card => card.dataset.bookingId === entry.id)
-          : [...schedule.querySelectorAll('button')].find(button => button.getAttribute('aria-label') === 'Unblock at ' + entry.time);
+          : [...schedule.querySelectorAll('button')].find(button => button.getAttribute('aria-label') === t("Unblock") + t(" at ") + entry.time);
         target?.focus();
       });
       timeline.append(event);
@@ -122,6 +135,11 @@ function render() {
   const day = date.value;
   if (!day) return;
   document.querySelector('#sidebar-date').textContent = shortDate.format(new Date(day));
+  for (const link of document.querySelectorAll('.language-switch a')) {
+    const url = new URL(link.href);
+    url.searchParams.set('day', day);
+    link.href = url.href;
+  }
   renderCalendar();
   const dailyBookings = bookings.filter(booking => booking.day === day).sort((a, b) => a.time.localeCompare(b.time));
   schedule.replaceChildren();
@@ -137,14 +155,14 @@ function render() {
     time.textContent = slot.time;
     const badge = document.createElement('span');
     badge.className = 'planner-badge ' + (slot.blocked ? 'blocked' : 'free');
-    badge.textContent = slot.blocked ? 'Blocked' : 'Available';
-    button.textContent = slot.blocked ? 'Unblock' : 'Block';
-    button.setAttribute('aria-label', button.textContent + ' at ' + slot.time);
+    badge.textContent = slot.blocked ? t("Blocked") : t("Available");
+    button.textContent = slot.blocked ? t("Unblock") : t("Block");
+    button.setAttribute('aria-label', button.textContent + t(" at ") + slot.time);
     button.addEventListener('click', async () => {
       button.disabled = true;
       try {
         await request('PATCH', { ...slot, blocked: !slot.blocked }, 'planning');
-        planningStatus.textContent = slot.blocked ? 'Time slot unblocked.' : 'Time slot blocked.';
+        planningStatus.textContent = slot.blocked ? t("Time slot unblocked.") : t("Time slot blocked.");
         await load();
       } catch (error) {
         planningStatus.textContent = error.message;
@@ -155,7 +173,7 @@ function render() {
     row.append(time, badge, button);
     schedule.append(row);
   }
-  if (!slots.length) schedule.textContent = 'No available or blocked time slots for this date.';
+  if (!slots.length) schedule.textContent = t("No available or blocked time slots for this date.");
 
   list.replaceChildren(...dailyBookings.map(booking => {
     const card = document.createElement('article');
@@ -165,7 +183,7 @@ function render() {
     const details = document.createElement('p');
     const contact = document.createElement('a');
     heading.textContent = booking.service;
-    details.textContent = [booking.time, booking.duration + ' min', booking.name].join(' · ');
+    details.textContent = [booking.time, booking.duration + t(" min"), booking.name].join(' · ');
     const badge = document.createElement('span');
     badge.className = 'planner-badge ' + booking.status;
     badge.textContent = labels[booking.status];
@@ -175,15 +193,15 @@ function render() {
     if (contact.textContent) card.append(contact);
     if (['pending', 'confirmed'].includes(booking.status)) {
       const actions = document.createElement('div');
-      for (const [next, label] of (booking.status === 'pending' ? [['confirmed', 'Confirm'], ['declined', 'Decline']] : [['declined', 'Cancel appointment']])) {
+      for (const [next, label] of (booking.status === 'pending' ? [['confirmed', t("Confirm")], ['declined', t("Decline")]] : [['declined', t("Cancel appointment")]])) {
         const button = document.createElement('button');
         button.textContent = label;
         button.addEventListener('click', async () => {
-          if (booking.status === 'confirmed' && !window.confirm('Cancel this appointment?')) return;
+          if (booking.status === 'confirmed' && !window.confirm(t("Cancel this appointment?"))) return;
           for (const control of actions.children) control.disabled = true;
           try {
             await request('PATCH', { id: booking.id, status: next });
-            status.textContent = 'Request updated.';
+            status.textContent = t("Request updated.");
             await load();
           } catch (error) {
             status.textContent = error.message;
@@ -196,9 +214,9 @@ function render() {
     }
     return card;
   }));
-  if (!dailyBookings.length) list.textContent = 'No requests or appointments on this date.';
+  if (!dailyBookings.length) list.textContent = t("No requests or appointments on this date.");
 }
-const dayFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeZone: 'UTC' });
+const dayFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' });
 for (const button of document.querySelectorAll('[data-step]')) {
   button.addEventListener('click', () => {
     if (!planning) return;
@@ -219,3 +237,12 @@ date.addEventListener('change', () => {
   if (planning) render();
 });
 load().catch(error => { status.textContent = error.message; });
+
+}
+initializePlanner().catch(() => {
+  document.querySelector('#status').textContent = {
+    nl: 'De planner kon niet worden geladen. Vernieuw de pagina.',
+    en: 'Could not load the planner. Please refresh the page.',
+    uk: 'Не вдалося завантажити планувальник. Оновіть сторінку.'
+  }[document.documentElement.lang];
+});
