@@ -1541,3 +1541,11 @@ input, select { max-width: 100%; min-width: 0; width: 100%; font-size: 1rem; }
   .planner .language-switch { max-width: 100%; }
   .planner .language-switch a { padding-inline: .45rem; }
 }
+
+@media (max-width: 48rem) {
+  .studio header > .language-switch {
+    flex-basis: 100%;
+    width: 100%;
+    justify-content: center;
+  }
+}
