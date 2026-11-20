@@ -1579,3 +1579,15 @@ input, select { max-width: 100%; min-width: 0; width: 100%; font-size: 1rem; }
 }
 .language-switch svg { display: block; flex-shrink: 0; border-radius: 2px; box-shadow: 0 0 0 1px #0002; }
 .language-switch a:focus-visible { outline: 3px solid #a77b50; outline-offset: 3px; }
+
+
+/* Studio Instagram profile feature — no third-party scripts or tracking. */
+.studio-instagram {display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;max-width:780px;margin:2rem auto 0;padding:1.35rem 1.5rem;border:1px solid var(--line);border-radius:1.25rem;background:linear-gradient(125deg,#fffaf6,#fcece3);text-align:left;box-shadow:0 12px 30px rgba(67,42,29,.06)}
+.studio-instagram .instagram-mark {display:grid;place-items:center;flex:0 0 54px;height:54px;border:1px solid var(--gold);border-radius:50%;color:var(--gold)}
+.studio-instagram .instagram-copy {flex:1 1 220px;min-width:0}
+.studio-instagram h3 {margin:0 0 .25rem;font-size:1.25rem}
+.studio-instagram p {margin:.15rem 0 .4rem;font-size:.94rem}
+.studio-instagram .instagram-handle {display:block;font-size:.83rem;overflow-wrap:anywhere;opacity:.8}
+.studio-instagram .instagram-visit {display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.7rem 1rem;border-radius:2rem;border:1px solid var(--gold);color:var(--ink);text-decoration:none;font-weight:600;font-size:.9rem;white-space:normal;text-align:center}
+.studio-instagram .instagram-visit:hover,.studio-instagram .instagram-visit:focus-visible {background:var(--gold);color:white}
+@media(max-width:48rem){.studio-instagram{padding:1.1rem;gap:.75rem}.studio-instagram .instagram-visit{width:100%}}
