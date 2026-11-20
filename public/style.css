@@ -1490,21 +1490,21 @@ article button { margin-top: .8rem; }
 .duration-659{height:790.8px}
 .duration-660{height:792.0px}
 
-#google-reviews article { margin-block: 1rem; }
-#google-reviews article p:first-child { display: flex; align-items: center; gap: .75rem; }
-#google-reviews img { border-radius: 50%; }
+#google-reviews img { border-radius: 50%; flex-shrink: 0; }
 .review-attribution { font-size: .875rem; color: var(--muted); }
-
 .studio #reviews { background: var(--soft); }
-.review-summary { font-size: 1.15rem; color: #795132; font-weight: 600; }
-.review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.25rem; margin-block: 1.5rem; }
-#google-reviews .review-card { display: flex; flex-direction: column; margin: 0; padding: 1.5rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
-.review-author { font-weight: 600; margin-top: 0; }
-.review-author a { text-decoration: none; }
-.review-stars { color: #886027; letter-spacing: .12em; margin: .25rem 0; }
-.review-text { flex: 1; line-height: 1.75; white-space: pre-line; overflow-wrap: anywhere; }
-.review-date { color: var(--muted); font-size: .875rem; }
-.review-card > a:last-child { font-size: .875rem; text-underline-offset: .2em; }
+.review-summary { font-size: 1.05rem; color: var(--accent); font-weight: 600; }
+.review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); align-items: start; gap: 1rem; margin-block: 1rem; }
+#google-reviews .review-card { display: flex; flex-direction: column; margin: 0; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.review-author { display: flex; align-items: center; gap: .55rem; font-weight: 600; margin: 0 0 .25rem; font-size: .9375rem; }
+.review-author a { text-decoration: none; overflow-wrap: anywhere; min-width: 0; }
+.review-stars { color: #886027; font-size: .875rem; letter-spacing: .08em; margin: .15rem 0; }
+.review-text { line-height: 1.55; font-size: .9375rem; margin: .5rem 0; white-space: pre-line; overflow-wrap: anywhere; }
+.studio .review-toggle { min-height: 44px; padding: .25rem 0; margin: 0; background: transparent; border: 0; border-radius: .25rem; color: var(--accent); font-size: .875rem; text-decoration: underline; text-underline-offset: .2em; }
+.studio .review-toggle:hover { background: transparent; color: var(--accent-hover); }
+.review-footer { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: .25rem .75rem; margin-top: .65rem; color: var(--muted); font-size: .875rem; }
+.review-date { margin: 0; font-size: inherit; }
+.review-footer a { text-underline-offset: .2em; }
 
 /* Prevent long treatment labels and booking references from widening the page. */
 .studio section > *, .booking-panel, .booking-section > *, .review-card,
@@ -1536,7 +1536,7 @@ input, select { max-width: 100%; min-width: 0; width: 100%; font-size: 1rem; }
   .studio .cards, .studio .review-grid { grid-template-columns: minmax(0, 1fr); }
   .studio .studio-logo { width: 88px; height: auto; margin-bottom: 1rem; }
   #behandelingen article button { margin-inline: 0; }
-  #google-reviews .review-card { padding: 1.1rem; }
+  #google-reviews .review-card { padding: 1rem; }
   .review-author { flex-wrap: wrap; }
   .review-attribution { line-height: 2; overflow-wrap: anywhere; }
   .salon-planner .planner-controls { width: 100%; }

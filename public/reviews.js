@@ -4,6 +4,8 @@ const container = document.querySelector('#google-reviews');
 const language = document.documentElement.lang;
 const en = language === 'en';
 const ukrainian = {" Google reviews": " відгуків Google", "Google reviewer": "Користувач Google", " out of 5 stars": " із 5 зірок", "View review on Google Maps": "Переглянути відгук у Google Maps", "View all reviews on Google Maps": "Усі відгуки в Google Maps", "Reviews supplied by Google Maps, sorted by relevance.": "Відгуки надано Google Maps і впорядковано за релевантністю.", "No review texts are available.": "Тексти відгуків недоступні.", "Google reviews are currently unavailable. Please try again later.": "Відгуки Google наразі недоступні. Спробуйте пізніше."};
+ukrainian['Read more'] = 'Читати далі';
+ukrainian['Show less'] = 'Згорнути';
 const localized = (english, dutch) => language === 'uk' ? ukrainian[english] || english : en ? english : dutch;
 function safeURL(value) {
   try {
@@ -34,7 +36,7 @@ async function loadReviews() {
     const grid = document.createElement('div');
     grid.className = 'review-grid';
     container.append(grid);
-    for (const review of data.reviews) {
+    for (const [index, review] of data.reviews.entries()) {
       const card = document.createElement('article');
       card.className = 'review-card';
       const author = document.createElement('p');
@@ -43,8 +45,8 @@ async function loadReviews() {
         const avatar = document.createElement('img');
         avatar.src = review.author.photoUri;
         avatar.alt = '';
-        avatar.width = 40;
-        avatar.height = 40;
+        avatar.width = 32;
+        avatar.height = 32;
         avatar.referrerPolicy = 'no-referrer';
         author.append(avatar);
       }
@@ -58,16 +60,40 @@ async function loadReviews() {
       rating.append(stars);
       const text = document.createElement('p');
       text.className = 'review-text';
-      text.textContent = review.text;
+      const fullText = review.text || '';
+      const needsToggle = fullText.length > 160;
+      const excerpt = needsToggle ? fullText.slice(0, 160).replace(/\s+\S*$/, '').trimEnd() + '…' : fullText;
+      text.id = 'review-text-' + index;
+      text.textContent = excerpt;
       if (review.language) text.lang = review.language;
       card.append(author, rating, text);
+      if (needsToggle) {
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'review-toggle';
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-controls', text.id);
+        toggle.textContent = localized('Read more', 'Lees meer');
+        toggle.addEventListener('click', () => {
+          const expand = toggle.getAttribute('aria-expanded') !== 'true';
+          toggle.setAttribute('aria-expanded', String(expand));
+          text.textContent = expand ? fullText : excerpt;
+          toggle.textContent = expand ? localized('Show less', 'Toon minder') : localized('Read more', 'Lees meer');
+        });
+        card.append(toggle);
+      }
+      const footer = document.createElement('div');
+      footer.className = 'review-footer';
       if (review.published && !Number.isNaN(Date.parse(review.published))) {
         const date = document.createElement('p');
         date.className = 'review-date';
         date.textContent = new Intl.DateTimeFormat(language === 'uk' ? 'uk-UA' : en ? 'en-GB' : 'nl-NL', { dateStyle: 'medium' }).format(new Date(review.published));
-        card.append(date);
+        footer.append(date);
       }
-      card.append(link(localized("View review on Google Maps", "Bekijk review op Google Maps"), review.url));
+      const source = link('Google Maps', review.url);
+      source.setAttribute('aria-label', localized('View review on Google Maps', 'Bekijk review op Google Maps'));
+      footer.append(source);
+      card.append(footer);
       grid.append(card);
     }
     for (const attribution of data.attributions || []) {
