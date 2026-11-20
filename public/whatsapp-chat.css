@@ -1,0 +1,17 @@
+.whatsapp-widget { position: fixed; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 50; max-width: calc(100vw - 2rem); font-size: 1rem; }
+.whatsapp-launcher { display: flex; align-items: center; gap: .6rem; margin-left: auto; border: 1px solid #a77b50; border-radius: 2rem; background: #795132; color: #fffaf5; box-shadow: 0 4px 20px #49301d30; min-height: 48px; }
+.whatsapp-launcher span { font-size: 1.35rem; line-height: 1; }
+.whatsapp-panel { position: absolute; bottom: calc(100% + .7rem); right: 0; width: min(23rem, calc(100vw - 2rem)); max-height: calc(100dvh - 6rem - env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; padding: 1.25rem; border: 1px solid #d7bfa3; border-radius: 1.2rem; background: #fffaf5; color: #493526; box-shadow: 0 12px 48px #49301d25; }
+.whatsapp-panel[hidden] { display: none; }
+.whatsapp-heading { display: flex; justify-content: space-between; align-items: start; gap: .5rem; }
+.whatsapp-eyebrow { font-size: .75rem; color: #795132; }
+.whatsapp-panel h2 { font: 1.65rem/1.2 Georgia, serif; margin: .25rem 0; overflow-wrap: anywhere; }
+.whatsapp-close { flex-shrink: 0; display: grid; place-items: center; background: transparent; color: #795132; padding: 0; width: 44px; height: 44px; font-size: 1.7rem; border-radius: 50%; }
+.whatsapp-greeting { padding: .85rem; border-radius: .8rem .8rem .8rem 0; background: #f4e8dc; line-height: 1.6; }
+.whatsapp-panel label { margin-bottom: .35rem; font-size: .9rem; }
+.whatsapp-panel textarea { display: block; box-sizing: border-box; width: 100%; min-height: 5.5rem; max-height: 12rem; resize: vertical; border: 1px solid #ad8a67; border-radius: .65rem; padding: .7rem; font: inherit; color: inherit; background: #fff; }
+.whatsapp-panel .whatsapp-continue { display: block; width: 100%; margin-top: .8rem; text-align: center; background: #795132; color: #fffaf5; border-radius: .65rem; overflow-wrap: anywhere; }
+#whatsapp-note { margin: .65rem 0 0; font-size: .8rem; line-height: 1.5; color: #705947; }
+.whatsapp-widget :focus-visible { outline: 3px solid #9a6a34; outline-offset: 3px; }
+@media (max-width: 30rem) { .whatsapp-launcher { padding: .6rem 1rem; font-size: .9rem; } .whatsapp-panel { padding: 1rem; } }
+@media print { .whatsapp-widget { display: none; } }

@@ -82,6 +82,8 @@ const assets = new Map(Object.entries({
   '/translations.uk.json': ['../translations.uk.json', 'application/json; charset=utf-8'],
   '/index.en.html': ['index.en.html', 'text/html; charset=utf-8'],
   '/translations.json': ['../translations.json', 'application/json; charset=utf-8'],
+  '/whatsapp-chat.js': ['whatsapp-chat.js', 'text/javascript; charset=utf-8'],
+  '/whatsapp-chat.css': ['whatsapp-chat.css', 'text/css; charset=utf-8'],
   '/navigation.js': ['navigation.js', 'text/javascript; charset=utf-8'],
   '/logo.webp': ['logo.webp', 'image/webp'],
   '/studio-mobile.webp': ['studio-mobile.webp', 'image/webp'],
