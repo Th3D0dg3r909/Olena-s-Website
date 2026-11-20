@@ -13,7 +13,7 @@
       <div class="whatsapp-heading"><div><span class="whatsapp-eyebrow">Olena Skin Care Studio</span><h2 id="whatsapp-title">${t.title}</h2></div><button class="whatsapp-close" type="button" aria-label="${t.close}">×</button></div>
       <p class="whatsapp-greeting">${t.greeting}</p>
       <label for="whatsapp-message">${t.label}</label><textarea id="whatsapp-message" rows="3" maxlength="1500" placeholder="${t.placeholder}" aria-describedby="whatsapp-note"></textarea>
-      <a class="button whatsapp-continue" target="_blank" rel="noopener noreferrer">${t.continue} ↗</a><p id="whatsapp-note">${t.note}</p>
+      <a class="button whatsapp-continue" target="_blank" rel="noopener noreferrer">${t.continue}</a><p id="whatsapp-note">${t.note}</p>
     </div>`;
   document.body.append(widget);
   const launcher = widget.querySelector('.whatsapp-launcher');

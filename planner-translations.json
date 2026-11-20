@@ -56,7 +56,8 @@
     "Could not load available times.": "Beschikbare tijden konden niet worden geladen.",
     "No available times for this date and treatment.": "Geen beschikbare tijden voor deze datum en behandeling.",
     "Saving appointment…": "Afspraak opslaan…",
-    "Appointment added.": "Afspraak toegevoegd."
+    "Appointment added.": "Afspraak toegevoegd.",
+    "View website": "Bekijk website"
   },
   "uk": {
     "Planning": "Планування",
@@ -115,6 +116,7 @@
     "Could not load available times.": "Не вдалося завантажити доступний час.",
     "No available times for this date and treatment.": "Для цієї дати та процедури немає доступного часу.",
     "Saving appointment…": "Збереження запису…",
-    "Appointment added.": "Запис додано."
+    "Appointment added.": "Запис додано.",
+    "View website": "Переглянути сайт"
   }
 }

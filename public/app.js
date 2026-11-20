@@ -29,13 +29,16 @@ async function load() {
     const description = document.createElement('p');
     heading.textContent = item.name;
     description.textContent = item.description;
+    description.className = 'treatment-description';
     const category = document.createElement('p');
     category.textContent = item.category;
+    category.className = 'treatment-category';
     const price = document.createElement('strong');
     price.textContent = '€' + item.price + ' · ' + (language === 'uk' ? item.durationLabel.replace('min', 'хв') : item.durationLabel);
     const choose = document.createElement('button');
     choose.type = 'button';
-    choose.textContent = t("Kies ") + item.name.toLowerCase();
+    choose.textContent = ({ nl: 'Boek een afspraak', en: 'Book an appointment', uk: 'Записатися' })[language] || 'Book an appointment';
+    choose.setAttribute('aria-label', choose.textContent + ' — ' + item.name);
     choose.addEventListener('click', () => {
       service.value = item.id;
       changeService();

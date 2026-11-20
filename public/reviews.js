@@ -1,3 +1,4 @@
+(() => {
 const reviewStatus = document.querySelector('#reviews-status');
 const container = document.querySelector('#google-reviews');
 const language = document.documentElement.lang;
@@ -81,3 +82,5 @@ async function loadReviews() {
   }
 }
 loadReviews();
+
+})();
