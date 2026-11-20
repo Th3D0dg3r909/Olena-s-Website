@@ -43,7 +43,20 @@
     "Cleanup minutes": "Opruimtijd in minuten",
     "Save": "Opslaan",
     "Cleanup time saved for new bookings.": "Opruimtijd opgeslagen voor nieuwe boekingen.",
-    "Cleanup time is reserved after each new appointment. Changes apply to new bookings. Existing appointments keep their reserved time.": "Na elke nieuwe afspraak wordt opruimtijd vrijgehouden. Wijzigingen gelden voor nieuwe boekingen. Bestaande afspraken behouden hun gereserveerde tijd."
+    "Cleanup time is reserved after each new appointment. Changes apply to new bookings. Existing appointments keep their reserved time.": "Na elke nieuwe afspraak wordt opruimtijd vrijgehouden. Wijzigingen gelden voor nieuwe boekingen. Bestaande afspraken behouden hun gereserveerde tijd.",
+    "Add appointment": "Afspraak toevoegen",
+    "Select a treatment and an available time. All times use Netherlands local time.": "Kies een behandeling en een beschikbaar tijdstip. Alle tijden zijn Nederlandse lokale tijd.",
+    "Treatment": "Behandeling",
+    "Appointment date": "Afspraakdatum",
+    "Start time": "Begintijd",
+    "Client name": "Klantnaam",
+    "Phone number": "Telefoonnummer",
+    "Save appointment": "Afspraak opslaan",
+    "Loading available times…": "Beschikbare tijden laden…",
+    "Could not load available times.": "Beschikbare tijden konden niet worden geladen.",
+    "No available times for this date and treatment.": "Geen beschikbare tijden voor deze datum en behandeling.",
+    "Saving appointment…": "Afspraak opslaan…",
+    "Appointment added.": "Afspraak toegevoegd."
   },
   "uk": {
     "Planning": "Планування",
@@ -89,6 +102,19 @@
     "Cleanup minutes": "Час прибирання у хвилинах",
     "Save": "Зберегти",
     "Cleanup time saved for new bookings.": "Час прибирання збережено для нових записів.",
-    "Cleanup time is reserved after each new appointment. Changes apply to new bookings. Existing appointments keep their reserved time.": "Після кожного нового запису резервується час для прибирання. Зміни діють для нових записів. Наявні записи зберігають зарезервований час."
+    "Cleanup time is reserved after each new appointment. Changes apply to new bookings. Existing appointments keep their reserved time.": "Після кожного нового запису резервується час для прибирання. Зміни діють для нових записів. Наявні записи зберігають зарезервований час.",
+    "Add appointment": "Додати запис",
+    "Select a treatment and an available time. All times use Netherlands local time.": "Виберіть процедуру та доступний час. Усі години вказано за місцевим часом Нідерландів.",
+    "Treatment": "Процедура",
+    "Appointment date": "Дата запису",
+    "Start time": "Час початку",
+    "Client name": "Ім’я клієнта",
+    "Phone number": "Номер телефону",
+    "Save appointment": "Зберегти запис",
+    "Loading available times…": "Завантаження доступного часу…",
+    "Could not load available times.": "Не вдалося завантажити доступний час.",
+    "No available times for this date and treatment.": "Для цієї дати та процедури немає доступного часу.",
+    "Saving appointment…": "Збереження запису…",
+    "Appointment added.": "Запис додано."
   }
 }

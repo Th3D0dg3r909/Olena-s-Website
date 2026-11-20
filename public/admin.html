@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Planning | Olena Skin Care Studio</title>
-<link rel="stylesheet" href="/style.css?v=54fbf39dfe27"><script defer src="/admin.js?v=30213031656d"></script>
+<link rel="stylesheet" href="/style.css?v=54fbf39dfe27"><script defer src="/admin.js?v=e09e672f88fe"></script>
 </head>
 <body class="planner salon-planner">
 <header><a class="brand" href="/?lang=en">Olena <span>Skin Care Studio</span></a><a href="/?lang=en">View website ↗</a><span class="language-switch" aria-label="Language"><a href="/admin?lang=nl" lang="nl" hreflang="nl"><span aria-hidden="true">🇳🇱</span> Nederlands</a><a href="/admin?lang=en" lang="en" hreflang="en" aria-current="page"><span aria-hidden="true">🇬🇧</span> English</a><a href="/admin?lang=uk" lang="uk" hreflang="uk"><span aria-hidden="true">🇺🇦</span> Українська</a></span></header>
@@ -16,6 +16,19 @@
 <p>Cleanup time is reserved after each new appointment. Changes apply to new bookings. Existing appointments keep their reserved time.</p>
 <p id="buffer-status" role="status"></p>
 <div id="buffer-settings"></div>
+</details>
+<details id="manual-appointment" class="planner-help">
+<summary>Add appointment</summary>
+<p>Select a treatment and an available time. All times use Netherlands local time.</p>
+<form id="manual-booking">
+<label>Treatment<select name="service" required></select></label>
+<label>Appointment date<input name="day" type="date" required></label>
+<label>Start time<select name="time" required></select></label>
+<label>Client name<input name="name" autocomplete="name" maxlength="100" required></label>
+<label>Phone number<input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required></label>
+<button type="submit" disabled>Save appointment</button>
+</form>
+<p id="manual-status" role="status"></p>
 </details>
 <div class="planner-toolbar">
 <h2 id="selected-day"></h2>

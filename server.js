@@ -160,7 +160,7 @@ createServer(async (req, res) => {
       const selected = configured.find(item => item.id === serviceId) || configured[0];
       return reply(200, { services: configured.map(item => language !== 'nl' ? { ...item, ...item[language] } : item), slots: slots({ duration: selected.duration + selected.buffer }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
-    if (req.method === 'POST' && route === '/api/bookings') {
+    if (req.method === 'POST' && ['/api/bookings', '/api/admin/bookings'].includes(route)) {
       const body = await readBody(req).catch(() => null);
       if (!body) return reply(400, { error: 'Ongeldig verzoek.' });
       const name = typeof body.name === 'string' ? body.name.trim() : '';

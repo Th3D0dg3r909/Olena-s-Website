@@ -236,8 +236,73 @@ date.addEventListener('change', () => {
   status.textContent = '';
   if (planning) render();
 });
+const manualPanel = document.querySelector('#manual-appointment');
+const manualForm = document.querySelector('#manual-booking');
+const manualStatus = document.querySelector('#manual-status');
+const manualSave = manualForm.querySelector('button');
+let availabilitySequence = 0;
+let savingAppointment = false;
+async function refreshManualAvailability() {
+  const sequence = ++availabilitySequence;
+  manualSave.disabled = true;
+  manualForm.elements.time.replaceChildren();
+  if (!manualForm.elements.service.value || !manualForm.elements.day.value) return;
+  manualStatus.textContent = t('Loading available times…');
+  try {
+    const response = await fetch('/api/options?lang=' + language + '&service=' + encodeURIComponent(manualForm.elements.service.value));
+    if (!response.ok) throw new Error(t('Could not load available times.'));
+    const options = await response.json();
+    if (sequence !== availabilitySequence) return;
+    const slots = options.slots.filter(slot => slot.day === manualForm.elements.day.value);
+    manualForm.elements.time.replaceChildren(...slots.map(slot => new Option(slot.time, slot.time)));
+    manualStatus.textContent = slots.length ? '' : t('No available times for this date and treatment.');
+    manualSave.disabled = savingAppointment || !slots.length;
+  } catch (error) {
+    if (sequence === availabilitySequence) manualStatus.textContent = error.message;
+  }
+}
+manualPanel.addEventListener('toggle', () => {
+  if (!manualPanel.open) return;
+  manualForm.elements.day.value = date.value || planning?.today || '';
+  refreshManualAvailability();
+});
+manualForm.elements.service.addEventListener('change', refreshManualAvailability);
+manualForm.elements.day.addEventListener('change', refreshManualAvailability);
+manualForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (savingAppointment || manualSave.disabled) return;
+  savingAppointment = true;
+  const values = Object.fromEntries(new FormData(manualForm));
+  manualSave.disabled = true;
+  for (const control of manualForm.elements) control.disabled = true;
+  manualStatus.textContent = t('Saving appointment…');
+  try {
+    await request('POST', values);
+    manualForm.reset();
+    manualPanel.open = false;
+    date.value = values.day;
+    status.textContent = t('Appointment added.');
+    await load().catch(() => {
+      status.textContent += ' ' + t('Could not load the planner. Please refresh the page.');
+    });
+  } catch (error) {
+    // Keep client details while refreshing a time that may have just been booked.
+    await refreshManualAvailability();
+    manualStatus.textContent = error.message;
+  } finally {
+    savingAppointment = false;
+    for (const control of manualForm.elements) control.disabled = false;
+    manualSave.disabled = !manualForm.elements.time.value;
+  }
+});
 async function loadBuffers() {
   const services = await request('GET', undefined, 'buffers');
+  const previousService = manualForm.elements.service.value;
+  manualForm.elements.service.replaceChildren(...services.map(service => new Option(
+    service.name + ' · ' + service.duration + t(' min') + ' + ' + service.buffer + t(' min') + ' ' + t('cleanup'), service.id
+  )));
+  if (previousService) manualForm.elements.service.value = previousService;
+  if (manualPanel.open) await refreshManualAvailability();
   const container = document.querySelector('#buffer-settings');
   container.replaceChildren();
   for (const service of services) {
