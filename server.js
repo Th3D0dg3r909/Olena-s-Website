@@ -21,6 +21,7 @@ db.exec(`
     status TEXT NOT NULL CHECK (status IN ('pending','confirmed','declined'))
   );
   CREATE TABLE IF NOT EXISTS blocked_slots (day TEXT NOT NULL, time TEXT NOT NULL, PRIMARY KEY(day,time));
+  CREATE TABLE IF NOT EXISTS service_buffers (service_id TEXT PRIMARY KEY, minutes INTEGER NOT NULL CHECK(minutes >= 0 AND minutes <= 120));
   CREATE UNIQUE INDEX IF NOT EXISTS occupied_slot ON bookings(day,time) WHERE status != 'declined';
 `);
 const local = new Intl.DateTimeFormat('sv-SE', {
@@ -33,11 +34,18 @@ if (!db.prepare('PRAGMA table_info(bookings)').all().some(column => column.name 
 if (!db.prepare('PRAGMA table_info(bookings)').all().some(column => column.name === 'phone')) {
   db.exec("ALTER TABLE bookings ADD COLUMN phone TEXT NOT NULL DEFAULT ''");
 }
+if (!db.prepare('PRAGMA table_info(bookings)').all().some(column => column.name === 'buffer')) {
+  db.exec('ALTER TABLE bookings ADD COLUMN buffer INTEGER NOT NULL DEFAULT 0');
+}
+function configuredServices() {
+  const overrides = new Map(db.prepare('SELECT service_id,minutes FROM service_buffers').all().map(row => [row.service_id, row.minutes]));
+  return services.map(service => ({ ...service, buffer: overrides.get(service.id) ?? (service.en.category === 'BROWS & LASHES' ? 5 : 15) }));
+}
 const minutes = time => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
 function slots({ includeBlocked = false, duration = 60 } = {}) {
   const [today, now] = local.format(new Date()).split(' ');
   const date = new Date(today + 'T00:00:00Z');
-  const occupied = db.prepare("SELECT day,time,duration FROM bookings WHERE day >= ? AND status != 'declined'").all(today);
+  const occupied = db.prepare("SELECT day,time,duration + buffer AS duration FROM bookings WHERE day >= ? AND status != 'declined'").all(today);
   if (!includeBlocked) {
     occupied.push(...db.prepare('SELECT day,time,60 AS duration FROM blocked_slots WHERE day >= ?').all(today));
   }
@@ -148,8 +156,9 @@ createServer(async (req, res) => {
     if (req.method === 'GET' && route === '/api/options') {
       const whatsapp = process.env.WHATSAPP_NUMBER || '';
       const serviceId = new URL(req.url, 'http://localhost').searchParams.get('service');
-      const selected = services.find(item => item.id === serviceId) || services[0];
-      return reply(200, { services: services.map(item => language !== 'nl' ? { ...item, ...item[language] } : item), slots: slots({ duration: selected.duration }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
+      const configured = configuredServices();
+      const selected = configured.find(item => item.id === serviceId) || configured[0];
+      return reply(200, { services: configured.map(item => language !== 'nl' ? { ...item, ...item[language] } : item), slots: slots({ duration: selected.duration + selected.buffer }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
     if (req.method === 'POST' && route === '/api/bookings') {
       const body = await readBody(req).catch(() => null);
@@ -159,16 +168,32 @@ createServer(async (req, res) => {
       const phoneDigits = phone.replace(/\D/g, '');
       if (!name || name.length > 100 || phone.length > 30 || !/^\+?[0-9 ()\.\-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15 ||
           !services.some(service => service.id === body.service)) return reply(400, { error: 'Controleer je naam, telefoonnummer en behandeling.' });
-      const selected = services.find(item => item.id === body.service);
       const id = randomUUID();
       const saved = transaction(() => {
-        if (!slots({ duration: selected.duration }).some(slot => slot.day === body.day && slot.time === body.time)) return false;
-        db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration,phone) VALUES (?,?,?,?,?,?,'confirmed',?,?)")
-          .run(id, body.day, body.time, body.service, name, '', selected.duration, phone);
+        const selected = configuredServices().find(item => item.id === body.service);
+        if (!slots({ duration: selected.duration + selected.buffer }).some(slot => slot.day === body.day && slot.time === body.time)) return false;
+        db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration,phone,buffer) VALUES (?,?,?,?,?,?,'confirmed',?,?,?)")
+          .run(id, body.day, body.time, body.service, name, '', selected.duration, phone, selected.buffer);
         return true;
       });
       if (!saved) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
-      return reply(201, { id, status: 'confirmed', day: body.day, time: body.time, duration: selected.duration });
+      return reply(201, { id, status: 'confirmed', day: body.day, time: body.time, duration: services.find(item => item.id === body.service).duration });
+    }
+    if (route === '/api/admin/buffers' && req.method === 'GET') {
+      return reply(200, configuredServices().map(service => ({
+        id: service.id, name: language === 'nl' ? service.name : service[language].name,
+        duration: service.duration, buffer: service.buffer
+      })));
+    }
+    if (route === '/api/admin/buffers' && req.method === 'PATCH') {
+      const body = await readBody(req).catch(() => null);
+      if (!body || !services.some(service => service.id === body.id) ||
+          !Number.isInteger(body.buffer) || body.buffer < 0 || body.buffer > 120) {
+        return reply(400, { error: 'Ongeldig verzoek.' });
+      }
+      db.prepare('INSERT INTO service_buffers VALUES (?,?) ON CONFLICT(service_id) DO UPDATE SET minutes = excluded.minutes')
+        .run(body.id, body.buffer);
+      return reply(200, { buffer: body.buffer });
     }
     if (route === '/api/admin/planning' && req.method === 'GET') {
       const [today] = local.format(new Date()).split(' ');

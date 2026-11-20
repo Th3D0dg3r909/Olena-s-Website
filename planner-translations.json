@@ -37,7 +37,13 @@
     "Request updated.": "Afspraak bijgewerkt.",
     "No requests or appointments on this date.": "Geen aanvragen of afspraken op deze datum.",
     " min": " min",
-    "Could not load the planner. Please refresh the page.": "De planner kon niet worden geladen. Vernieuw de pagina."
+    "Could not load the planner. Please refresh the page.": "De planner kon niet worden geladen. Vernieuw de pagina.",
+    "cleanup": "opruimtijd",
+    "Cleanup time per treatment": "Opruimtijd per behandeling",
+    "Cleanup minutes": "Opruimtijd in minuten",
+    "Save": "Opslaan",
+    "Cleanup time saved for new bookings.": "Opruimtijd opgeslagen voor nieuwe boekingen.",
+    "Cleanup time is reserved after each new appointment. Changes apply to new bookings. Existing appointments keep their reserved time.": "Na elke nieuwe afspraak wordt opruimtijd vrijgehouden. Wijzigingen gelden voor nieuwe boekingen. Bestaande afspraken behouden hun gereserveerde tijd."
   },
   "uk": {
     "Planning": "Планування",
@@ -77,6 +83,12 @@
     "Request updated.": "Запис оновлено.",
     "No requests or appointments on this date.": "На цю дату немає запитів або записів.",
     " min": " хв",
-    "Could not load the planner. Please refresh the page.": "Не вдалося завантажити планувальник. Оновіть сторінку."
+    "Could not load the planner. Please refresh the page.": "Не вдалося завантажити планувальник. Оновіть сторінку.",
+    "cleanup": "прибирання",
+    "Cleanup time per treatment": "Час прибирання після кожної процедури",
+    "Cleanup minutes": "Час прибирання у хвилинах",
+    "Save": "Зберегти",
+    "Cleanup time saved for new bookings.": "Час прибирання збережено для нових записів.",
+    "Cleanup time is reserved after each new appointment. Changes apply to new bookings. Existing appointments keep their reserved time.": "Після кожного нового запису резервується час для прибирання. Зміни діють для нових записів. Наявні записи зберігають зарезервований час."
   }
 }

@@ -109,13 +109,13 @@ function renderCalendar() {
     ];
     for (const entry of entries) {
       const offset = timeMinutes(entry.time) - 600;
-      const duration = Math.min(entry.duration, 660 - offset);
+      const duration = Math.min(entry.duration + (entry.buffer || 0), 660 - offset);
       if (offset < 0 || duration <= 0) continue;
       const event = document.createElement('button');
       event.type = 'button';
       event.className = 'calendar-event ' + entry.status + ' start-' + offset + ' duration-' + duration;
       event.textContent = entry.time + ' · ' + entry.name;
-      event.title = [entry.name, entry.service, entry.duration + t(" min"), labels[entry.status] || t("Blocked")].filter(Boolean).join(' · ');
+      event.title = [entry.name, entry.service, entry.duration + t(" min") + ' + ' + (entry.buffer || 0) + t(" min") + ' ' + t('cleanup'), labels[entry.status] || t("Blocked")].filter(Boolean).join(' · ');
       event.setAttribute('aria-label', event.title);
       event.addEventListener('click', () => {
         selectDay(day);
@@ -183,7 +183,7 @@ function render() {
     const details = document.createElement('p');
     const contact = document.createElement('a');
     heading.textContent = booking.service;
-    details.textContent = [booking.time, booking.duration + t(" min"), booking.name].join(' · ');
+    details.textContent = [booking.time, booking.duration + t(" min") + ' + ' + (booking.buffer || 0) + t(" min") + ' ' + t('cleanup'), booking.name].join(' · ');
     const badge = document.createElement('span');
     badge.className = 'planner-badge ' + booking.status;
     badge.textContent = labels[booking.status];
@@ -236,6 +236,44 @@ date.addEventListener('change', () => {
   status.textContent = '';
   if (planning) render();
 });
+async function loadBuffers() {
+  const services = await request('GET', undefined, 'buffers');
+  const container = document.querySelector('#buffer-settings');
+  container.replaceChildren();
+  for (const service of services) {
+    const form = document.createElement('form');
+    const label = document.createElement('label');
+    label.textContent = service.name + ' · ' + t('Cleanup minutes');
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.max = '120';
+    input.step = '1';
+    input.required = true;
+    input.value = service.buffer;
+    label.append(input);
+    const save = document.createElement('button');
+    save.type = 'submit';
+    save.textContent = t('Save');
+    form.append(label, save);
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      save.disabled = true;
+      const message = document.querySelector('#buffer-status');
+      try {
+        await request('PATCH', { id: service.id, buffer: Number(input.value) }, 'buffers');
+        message.textContent = t('Cleanup time saved for new bookings.');
+        await load();
+      } catch (error) {
+        message.textContent = error.message;
+      } finally {
+        save.disabled = false;
+      }
+    });
+    container.append(form);
+  }
+}
+loadBuffers().catch(error => { document.querySelector('#buffer-status').textContent = error.message; });
 load().catch(error => { status.textContent = error.message; });
 
 }
