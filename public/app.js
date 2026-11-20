@@ -1,6 +1,7 @@
-const english = document.documentElement.lang === 'en';
+const language = document.documentElement.lang;
+const english = language === 'en';
 let translations = {};
-const t = text => english ? translations[text] || text : text;
+const t = text => language === 'nl' ? text : translations[text] || text;
 const form = document.querySelector('#booking');
 const status = document.querySelector('#status');
 const button = form.querySelector('button');
@@ -17,9 +18,9 @@ async function load() {
   slots = options.slots;
   const previousDay = day.value;
   const previousService = service.value;
-  service.replaceChildren(...options.services.map(item => new Option(item.name + ' · €' + item.price + ' · ' + item.durationLabel, item.id)));
+  service.replaceChildren(...options.services.map(item => new Option(item.name + ' · €' + item.price + ' · ' + (language === 'uk' ? item.durationLabel.replace('min', 'хв') : item.durationLabel), item.id)));
   if ([...service.options].some(option => option.value === previousService)) service.value = previousService;
-  const formatDay = new Intl.DateTimeFormat(english ? 'en-GB' : 'nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
+  const formatDay = new Intl.DateTimeFormat(({ en: 'en-GB', uk: 'uk-UA', nl: 'nl-NL' })[language], { dateStyle: 'full', timeZone: 'UTC' });
   day.replaceChildren(...[...new Set(slots.map(slot => slot.day))].map(value => new Option(formatDay.format(new Date(value)), value)));
   if ([...day.options].some(option => option.value === previousDay)) day.value = previousDay;
   document.querySelector('#services').replaceChildren(...options.services.map(item => {
@@ -31,7 +32,7 @@ async function load() {
     const category = document.createElement('p');
     category.textContent = item.category;
     const price = document.createElement('strong');
-    price.textContent = '€' + item.price + ' · ' + item.durationLabel;
+    price.textContent = '€' + item.price + ' · ' + (language === 'uk' ? item.durationLabel.replace('min', 'хв') : item.durationLabel);
     const choose = document.createElement('button');
     choose.type = 'button';
     choose.textContent = t("Kies ") + item.name.toLowerCase();
@@ -74,7 +75,7 @@ async function changeService() {
     if (requestId !== availabilityRequest) return;
     slots = options.slots;
     const previous = day.value;
-    const formatDay = new Intl.DateTimeFormat(english ? 'en-GB' : 'nl-NL', { dateStyle: 'full', timeZone: 'UTC' });
+    const formatDay = new Intl.DateTimeFormat(({ en: 'en-GB', uk: 'uk-UA', nl: 'nl-NL' })[language], { dateStyle: 'full', timeZone: 'UTC' });
     day.replaceChildren(...[...new Set(slots.map(slot => slot.day))].map(value => new Option(formatDay.format(new Date(value)), value)));
     if ([...day.options].some(option => option.value === previous)) day.value = previous;
     updateTimes();
@@ -113,7 +114,7 @@ form.addEventListener('submit', async event => {
     button.disabled = !time.value;
   }
 });
-(english ? fetch('/translations.json').then(response => {
+(language !== 'nl' ? fetch(language === 'uk' ? '/translations.uk.json' : '/translations.json').then(response => {
   if (!response.ok) throw new Error();
   return response.json();
 }).then(value => { translations = value; }) : Promise.resolve()).then(load).then(() => {

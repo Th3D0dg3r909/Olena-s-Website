@@ -11,6 +11,11 @@
       "category": "CLEANSING & RENEWAL",
       "name": "Deep Cleansing & Hydration Facial",
       "description": "Hydrodermabrasion for deep cleansing and gentle exfoliation, using specialised serums tailored to specific skin type followed by hydration and cooling care (ZEMITS DermoLuxx Pro; cryotherapy)"
+    },
+    "uk": {
+      "name": "Глибоке очищення та зволоження",
+      "description": "Гідродермабразія для глибокого очищення й делікатного відлущування зі спеціальними сироватками, підібраними за типом шкіри, з подальшим зволоженням та охолоджувальним доглядом (ZEMITS DermoLuxx Pro; кріотерапія).",
+      "category": "ОЧИЩЕННЯ ТА ОНОВЛЕННЯ"
     }
   },
   {
@@ -25,6 +30,11 @@
       "category": "CLEANSING & RENEWAL",
       "name": "Deep Cleansing Facial",
       "description": "Thorough manual cleansing tailored to your skin, followed by soothing care"
+    },
+    "uk": {
+      "name": "Глибоке очищення обличчя",
+      "description": "Ретельне мануальне очищення відповідно до потреб шкіри із завершальним заспокійливим доглядом.",
+      "category": "ОЧИЩЕННЯ ТА ОНОВЛЕННЯ"
     }
   },
   {
@@ -39,6 +49,11 @@
       "category": "CLEANSING & RENEWAL",
       "name": "Back Cleansing Treatment",
       "description": "Thorough cleansing of the back, followed by calming finishing care"
+    },
+    "uk": {
+      "name": "Глибоке очищення спини",
+      "description": "Ретельне очищення шкіри спини із завершальним заспокійливим доглядом.",
+      "category": "ОЧИЩЕННЯ ТА ОНОВЛЕННЯ"
     }
   },
   {
@@ -53,6 +68,11 @@
       "category": "FACIAL CARE & MASSAGE",
       "name": "Anti-Ageing Facial & Massage",
       "description": "A relaxing facial with massage of the face, neck and décolleté (classic massage and lymphatic drainage techniques)"
+    },
+    "uk": {
+      "name": "Антивіковий догляд за обличчям і масаж",
+      "description": "Розслаблювальний догляд із масажем обличчя, шиї та декольте (класичний масаж і лімфодренажні техніки).",
+      "category": "ДОГЛЯД ЗА ОБЛИЧЧЯМ І МАСАЖ"
     }
   },
   {
@@ -67,6 +87,11 @@
       "category": "FACIAL CARE & MASSAGE",
       "name": "Brightening & Hydrating Facial",
       "description": "Hydrating and brightening care to improve skin radiance and reduce the appearance of uneven pigmentation"
+    },
+    "uk": {
+      "name": "Освітлювальний та зволожувальний догляд",
+      "description": "Зволожувальний та освітлювальний догляд для сяйва шкіри й зменшення видимості пігментних плям.",
+      "category": "ДОГЛЯД ЗА ОБЛИЧЧЯМ І МАСАЖ"
     }
   },
   {
@@ -81,6 +106,11 @@
       "category": "FACIAL CARE & MASSAGE",
       "name": "Firming Facial & WOW Mask",
       "description": "Facial care with massage of the face, neck, décolleté and hands (HYALUAL WOW Lift Mask) + LED Therapy"
+    },
+    "uk": {
+      "name": "Зміцнювальний догляд і WOW-маска",
+      "description": "Догляд із масажем обличчя, шиї, декольте та рук (HYALUAL WOW Lift Mask) + LED-терапія.",
+      "category": "ДОГЛЯД ЗА ОБЛИЧЧЯМ І МАСАЖ"
     }
   },
   {
@@ -95,6 +125,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "Deep Hydration Facial",
       "description": "Intensive hydrating care for dehydrated skin (FR-HAUT HY+)"
+    },
+    "uk": {
+      "name": "Інтенсивне зволоження",
+      "description": "Інтенсивний зволожувальний догляд для зневодненої шкіри (FR-HAUT HY+).",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -109,6 +144,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "Calming Facial for Redness-Prone Skin",
       "description": "Gentle, soothing care for skin prone to redness and sensitivity (FR-HAUT OxygenO2) + LED Therapy"
+    },
+    "uk": {
+      "name": "Заспокійливий догляд для шкіри, схильної до почервоніння",
+      "description": "Делікатний заспокійливий догляд для чутливої шкіри, схильної до почервоніння (FR-HAUT OxygenO2) + LED-терапія.",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -123,6 +163,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "Firming & Revitalising Facial",
       "description": "Revitalising care with a gentle superficial peel to refine the appearance of skin texture (FR-HAUT White Tea)"
+    },
+    "uk": {
+      "name": "Зміцнювальний та відновлювальний догляд",
+      "description": "Відновлювальний догляд із делікатним поверхневим пілінгом для покращення вигляду текстури шкіри (FR-HAUT White Tea).",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -137,6 +182,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "Vitamin C Radiance Facial",
       "description": "Antioxidant care to refresh dull-looking skin and enhance radiance (FR-HAUT Citrus Care; vitamin C)"
+    },
+    "uk": {
+      "name": "Догляд із вітаміном C для сяйва шкіри",
+      "description": "Антиоксидантний догляд для свіжого вигляду та сяйва шкіри (FR-HAUT Citrus Care; вітамін C).",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -151,6 +201,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "Gentle Carboxy Facial",
       "description": "Comfort-focused carboxytherapy for sensitive skin (Amber-Carelika) + LED Therapy"
+    },
+    "uk": {
+      "name": "Делікатна карбокситерапія",
+      "description": "Заспокійлива карбокситерапія для чутливої шкіри (Amber-Carelika) + LED-терапія.",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -165,6 +220,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "Balancing Carboxy Facial",
       "description": "Carboxytherapy for normal, combination and oily skin (Renew) + LED Therapy"
+    },
+    "uk": {
+      "name": "Балансувальна карбокситерапія",
+      "description": "Карбокситерапія для нормальної, комбінованої та жирної шкіри (Renew) + LED-терапія.",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -179,6 +239,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "BioEnzyme Renewal Facial",
       "description": "Enzyme-based exfoliation for smoother, fresher-looking skin (Renew BioEnzyme Therapy)"
+    },
+    "uk": {
+      "name": "Біоензимний догляд",
+      "description": "Ензимне відлущування для більш гладенької та свіжої шкіри (Renew BioEnzyme Therapy).",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -193,6 +258,11 @@
       "category": "PERSONALISED SKIN CARE",
       "name": "Enzyme Renewal Facial",
       "description": "Gentle enzyme exfoliation and soothing finishing care (Smart 4 Derma) + LED Therapy"
+    },
+    "uk": {
+      "name": "Ензимний догляд",
+      "description": "Делікатне ензимне відлущування із завершальним заспокійливим доглядом (Smart 4 Derma) + LED-терапія.",
+      "category": "ІНДИВІДУАЛЬНИЙ ДОГЛЯД ЗА ШКІРОЮ"
     }
   },
   {
@@ -207,6 +277,11 @@
       "category": "ADVANCED SKIN TREATMENTS",
       "name": "Microneedling - Face",
       "description": "Microneedling to improve the appearance of skin texture and tone (microneedling pen)"
+    },
+    "uk": {
+      "name": "Мікронідлінг — обличчя",
+      "description": "Мікронідлінг для покращення видимої текстури й тону шкіри (мікронідлінг-пен).",
+      "category": "ІНТЕНСИВНІ ПРОЦЕДУРИ ДЛЯ ШКІРИ"
     }
   },
   {
@@ -221,6 +296,11 @@
       "category": "ADVANCED SKIN TREATMENTS",
       "name": "Microneedling - Face & Neck",
       "description": "Microneedling for the face and neck, focused on skin texture and tone (microneedling pen)"
+    },
+    "uk": {
+      "name": "Мікронідлінг — обличчя та шия",
+      "description": "Мікронідлінг обличчя та шиї для покращення текстури й тону шкіри (мікронідлінг-пен).",
+      "category": "ІНТЕНСИВНІ ПРОЦЕДУРИ ДЛЯ ШКІРИ"
     }
   },
   {
@@ -235,6 +315,11 @@
       "category": "ADVANCED SKIN TREATMENTS",
       "name": "Microneedling - Face, Neck & Décolleté",
       "description": "Microneedling for three treatment areas (microneedling pen)"
+    },
+    "uk": {
+      "name": "Мікронідлінг — обличчя, шия та декольте",
+      "description": "Мікронідлінг трьох зон (мікронідлінг-пен).",
+      "category": "ІНТЕНСИВНІ ПРОЦЕДУРИ ДЛЯ ШКІРИ"
     }
   },
   {
@@ -249,6 +334,11 @@
       "category": "PROFESSIONAL PEELS",
       "name": "PRX-T33 Facial Peel",
       "description": "Professional facial peel for refreshed, smoother-looking skin (PRX-T33)"
+    },
+    "uk": {
+      "name": "Пілінг обличчя PRX-T33",
+      "description": "Професійний пілінг для свіжого вигляду та більш гладенької шкіри (PRX-T33).",
+      "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
     }
   },
   {
@@ -263,6 +353,11 @@
       "category": "PROFESSIONAL PEELS",
       "name": "BioRePeel Facial Peel",
       "description": "Exfoliating facial peel to refresh skin texture and radiance (BioRePeelCl3)"
+    },
+    "uk": {
+      "name": "Пілінг обличчя BioRePeel",
+      "description": "Відлущувальний пілінг для покращення текстури й свіжого вигляду шкіри (BioRePeelCl3).",
+      "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
     }
   },
   {
@@ -277,6 +372,11 @@
       "category": "PROFESSIONAL PEELS",
       "name": "Esabiopeel Renewal Peel",
       "description": "Professional exfoliating care for a smoother, more even-looking complexion (Esabiopeel)"
+    },
+    "uk": {
+      "name": "Оновлювальний пілінг Esabiopeel",
+      "description": "Професійний відлущувальний догляд для більш гладенького й рівного тону шкіри (Esabiopeel).",
+      "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
     }
   },
   {
@@ -291,6 +391,11 @@
       "category": "PROFESSIONAL PEELS",
       "name": "ENERPEEL Professional Peel",
       "description": "Peel formula selected for your skin and treatment area (Mandelac, Jessner, Neck or Salicylic SA-15)"
+    },
+    "uk": {
+      "name": "Професійний пілінг ENERPEEL",
+      "description": "Пілінг, підібраний відповідно до потреб шкіри та зони догляду (Mandelac, Jessner, Neck або Salicylic SA-15).",
+      "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
     }
   },
   {
@@ -305,6 +410,11 @@
       "category": "PROFESSIONAL PEELS",
       "name": "Pumpkin Renewal Facial",
       "description": "Exfoliating facial with a pumpkin-based peel and finishing care (Pumpkin Peeling)"
+    },
+    "uk": {
+      "name": "Гарбузовий пілінг і догляд",
+      "description": "Догляд за обличчям із гарбузовим пілінгом та завершальним доглядом (Pumpkin Peeling).",
+      "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
     }
   },
   {
@@ -319,6 +429,11 @@
       "category": "BROWS & LASHES",
       "name": "Eyebrow or Eyelash Tinting",
       "description": "Colour enhancement for brows or lashes"
+    },
+    "uk": {
+      "name": "Фарбування брів або вій",
+      "description": "Фарбування брів або вій для виразнішого кольору.",
+      "category": "БРОВИ ТА ВІЇ"
     }
   },
   {
@@ -333,6 +448,11 @@
       "category": "BROWS & LASHES",
       "name": "Eyebrow Shaping",
       "description": "Precise brow shaping with tweezers"
+    },
+    "uk": {
+      "name": "Корекція брів",
+      "description": "Точне моделювання форми брів пінцетом.",
+      "category": "БРОВИ ТА ВІЇ"
     }
   },
   {
@@ -347,6 +467,11 @@
       "category": "BROWS & LASHES",
       "name": "Eyebrow Shaping & Tinting",
       "description": "Brow shaping and tinting in one appointment"
+    },
+    "uk": {
+      "name": "Корекція та фарбування брів",
+      "description": "Корекція та фарбування брів за один візит.",
+      "category": "БРОВИ ТА ВІЇ"
     }
   },
   {
@@ -361,6 +486,11 @@
       "category": "BROWS & LASHES",
       "name": "Brow Shaping, Brow & Lash Tinting",
       "description": "Complete brow and lash colour service"
+    },
+    "uk": {
+      "name": "Комплексний догляд за бровами та віями",
+      "description": "Корекція та фарбування брів, а також фарбування вій.",
+      "category": "БРОВИ ТА ВІЇ"
     }
   },
   {
@@ -375,6 +505,11 @@
       "category": "NEW CLIENT OFFER",
       "name": "First Visit Facial & Skin Care Procedure",
       "description": "A personalised facial with an initial skin consultation and individual skincare recommendations. Introductory price for first-time clients only. Available once per client."
+    },
+    "uk": {
+      "name": "Перший догляд і консультація щодо шкіри",
+      "description": "Індивідуальний догляд за обличчям із первинним аналізом шкіри та особистими рекомендаціями. Спеціальна ціна для нових клієнтів. Одноразово для кожного клієнта.",
+      "category": "ПРОПОЗИЦІЯ ДЛЯ НОВИХ КЛІЄНТІВ"
     }
   }
 ]

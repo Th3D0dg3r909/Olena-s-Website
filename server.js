@@ -6,6 +6,7 @@ import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
 const translations = JSON.parse(readFileSync(new URL('./translations.json', import.meta.url)));
+const ukrainianTranslations = JSON.parse(readFileSync(new URL('./translations.uk.json', import.meta.url)));
 const services = JSON.parse(readFileSync(new URL('./services.json', import.meta.url)));
 const path = process.env.DATABASE_PATH || './data/bookings.sqlite';
 mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
@@ -67,6 +68,8 @@ const hash = (value) => createHash('sha256').update(value).digest();
 const adminHash = adminPassword && hash('Basic ' + Buffer.from('olena:' + adminPassword).toString('base64'));
 const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
+  '/index.uk.html': ['index.uk.html', 'text/html; charset=utf-8'],
+  '/translations.uk.json': ['../translations.uk.json', 'application/json; charset=utf-8'],
   '/index.en.html': ['index.en.html', 'text/html; charset=utf-8'],
   '/translations.json': ['../translations.json', 'application/json; charset=utf-8'],
   '/navigation.js': ['navigation.js', 'text/javascript; charset=utf-8'],
@@ -95,9 +98,11 @@ createServer(async (req, res) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' https://*.googleusercontent.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'no-store');
-  const english = new URL(req.url, 'http://localhost').searchParams.get('lang') === 'en';
+  const requestedLanguage = new URL(req.url, 'http://localhost').searchParams.get('lang');
+  const language = ['en', 'uk'].includes(requestedLanguage) ? requestedLanguage : 'nl';
+  const english = language === 'en';
   const reply = (status, data) => {
-    if (english && data?.error) data = { ...data, error: translations[data.error] || data.error };
+    if (language !== 'nl' && data?.error) data = { ...data, error: (language === 'uk' ? ukrainianTranslations : translations)[data.error] || data.error };
     res.writeHead(status, {'Content-Type': 'application/json; charset=utf-8'});
     res.end(JSON.stringify(data));
   };
@@ -111,13 +116,13 @@ createServer(async (req, res) => {
       }
     }
     if (req.method === 'GET' && assets.has(route)) {
-      const [body, type] = assets.get(route === '/' && english ? '/index.en.html' : route);
+      const [body, type] = assets.get(route === '/' && language !== 'nl' ? '/index.' + language + '.html' : route);
       res.writeHead(200, { 'Content-Type': type });
       return res.end(body);
     }
     if (req.method === 'GET' && route === '/api/reviews') {
       try {
-        const result = await getReviews(english ? 'en' : 'nl');
+        const result = await getReviews(language);
         return reply(result.status, result.data);
       } catch {
         return reply(502, { error: 'Google reviews are temporarily unavailable.' });
@@ -127,7 +132,7 @@ createServer(async (req, res) => {
       const whatsapp = process.env.WHATSAPP_NUMBER || '';
       const serviceId = new URL(req.url, 'http://localhost').searchParams.get('service');
       const selected = services.find(item => item.id === serviceId) || services[0];
-      return reply(200, { services: services.map(item => english ? { ...item, ...item.en } : item), slots: slots({ duration: selected.duration }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
+      return reply(200, { services: services.map(item => language !== 'nl' ? { ...item, ...item[language] } : item), slots: slots({ duration: selected.duration }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
     if (req.method === 'POST' && route === '/api/bookings') {
       const body = await readBody(req).catch(() => null);
