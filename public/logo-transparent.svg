@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 360 450" role="img" aria-label="Olena Skin Care Studio">
+  <defs>
+    <!-- Remove the uniform blush backdrop while retaining the original artwork. -->
+    <filter id="transparent-blush" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 -8 0 7.02"/>
+    </filter>
+  </defs>
+  <image href="logo.webp" x="0" y="0" width="360" height="450" preserveAspectRatio="xMidYMid meet" filter="url(#transparent-blush)"/>
+</svg>
