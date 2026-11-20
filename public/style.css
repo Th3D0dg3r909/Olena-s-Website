@@ -1549,3 +1549,11 @@ input, select { max-width: 100%; min-width: 0; width: 100%; font-size: 1rem; }
     justify-content: center;
   }
 }
+
+/* Flag icons stay consistent across platforms and provide generous touch targets. */
+.studio .language-switch a, .planner .language-switch a {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 48px; min-height: 44px; padding: .5rem;
+}
+.language-switch svg { display: block; flex-shrink: 0; border-radius: 2px; box-shadow: 0 0 0 1px #0002; }
+.language-switch a:focus-visible { outline: 3px solid #a77b50; outline-offset: 3px; }
