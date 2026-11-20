@@ -7,6 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 
 const translations = JSON.parse(readFileSync(new URL('./translations.json', import.meta.url)));
 const ukrainianTranslations = JSON.parse(readFileSync(new URL('./translations.uk.json', import.meta.url)));
+const plannerHelp = JSON.parse(readFileSync(new URL('./planner-help.json', import.meta.url)));
 const plannerTranslations = JSON.parse(readFileSync(new URL('./planner-translations.json', import.meta.url)));
 const services = JSON.parse(readFileSync(new URL('./services.json', import.meta.url)));
 const path = process.env.DATABASE_PATH || './data/bookings.sqlite';
@@ -131,6 +132,7 @@ createServer(async (req, res) => {
         html = html.replaceAll('href="/?lang=en"', 'href="/?lang=' + language + '"');
         html = html.replaceAll(' aria-current="page"', '');
         html = html.replace('href="/admin?lang=' + language + '"', 'aria-current="page" href="/admin?lang=' + language + '"');
+        html = html.replace('<!--PLANNER_HELP-->', plannerHelp[language]);
         return res.end(html);
       }
       return res.end(body);
