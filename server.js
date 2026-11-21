@@ -88,6 +88,7 @@ const assets = new Map(Object.entries({
   '/logo.webp': ['logo.webp', 'image/webp'],
   '/studio-mobile.webp': ['studio-mobile.webp', 'image/webp'],
   '/logo.png': ['logo.png', 'image/png'],
+  '/logo-transparent.svg': ['logo-transparent.svg', 'image/svg+xml'],
   '/studio.webp': ['studio.webp', 'image/webp'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/reviews.js': ['reviews.js', 'text/javascript; charset=utf-8'],
