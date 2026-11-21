@@ -61,6 +61,18 @@ function slots({ includeBlocked = false, duration = 60, days = 28 } = {}) {
   }
   return result;
 }
+// Personal data is kept for a limited time: bookings are deleted this many months after the appointment date.
+const retentionMonths = Math.min(Math.max(Math.round(Number(process.env.BOOKING_RETENTION_MONTHS)) || 12, 1), 120);
+function removeOldData() {
+  const [today] = local.format(new Date()).split(' ');
+  const cutoff = new Date(today + 'T00:00:00Z');
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - retentionMonths);
+  const removed = db.prepare('DELETE FROM bookings WHERE day < ?').run(cutoff.toISOString().slice(0, 10)).changes;
+  db.prepare('DELETE FROM blocked_slots WHERE day < ?').run(today);
+  if (removed) console.log('Removed ' + removed + ' bookings older than ' + retentionMonths + ' months.');
+}
+removeOldData();
+setInterval(removeOldData, 24 * 60 * 60 * 1000).unref();
 function transaction(action) {
   db.exec('BEGIN IMMEDIATE');
   try {
@@ -107,6 +119,9 @@ const hash = (value) => createHash('sha256').update(value).digest();
 const adminHash = adminPassword && hash('Basic ' + Buffer.from('olena:' + adminPassword).toString('base64'));
 const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
+  '/privacy': ['privacy.html', 'text/html; charset=utf-8'],
+  '/privacy.en.html': ['privacy.en.html', 'text/html; charset=utf-8'],
+  '/privacy.uk.html': ['privacy.uk.html', 'text/html; charset=utf-8'],
   '/index.uk.html': ['index.uk.html', 'text/html; charset=utf-8'],
   '/translations.uk.json': ['../translations.uk.json', 'application/json; charset=utf-8'],
   '/index.en.html': ['index.en.html', 'text/html; charset=utf-8'],
@@ -125,7 +140,18 @@ const assets = new Map(Object.entries({
   '/admin': ['admin.html', 'text/html; charset=utf-8'],
   '/planner-translations.json': ['../planner-translations.json', 'application/json; charset=utf-8'],
   '/admin.js': ['admin.js', 'text/javascript; charset=utf-8'],
-}).map(([route, [file,type]]) => [route,[readFileSync(new URL('./public/' + file, import.meta.url)),type]]));
+}).map(([route, [file,type]]) => [route, [readFileSync(new URL('./public/' + file, import.meta.url)), type]]));
+// Each ?v= in a page is set to the linked file's content hash at startup, so an edited file always gets a new
+// address and browsers never keep an outdated copy, even though linked files are cached for a year.
+const versions = new Map([...assets].map(([route, [body]]) => [route, createHash('sha256').update(body).digest('hex').slice(0, 12)]));
+for (const [route, entry] of assets) {
+  if (entry[1].startsWith('text/html')) {
+    entry[0] = Buffer.from(entry[0].toString().replace(/(\/[\w.-]+)\?v=[\w-]+/g, (link, path) => versions.has(path) ? path + '?v=' + versions.get(path) : link));
+  }
+  entry.push('"' + createHash('sha256').update(entry[0]).digest('base64url').slice(0, 22) + '"');
+}
+// Pages that exist in Dutch, English and Ukrainian; ?lang= picks the file.
+const localizedPages = { '/': '/index', '/privacy': '/privacy' };
 async function readBody(req) {
   if (req.headers['content-type'] !== 'application/json' || req.headers['x-olena-request'] !== '1') throw new Error('Ongeldig verzoek.');
   let body = '';
@@ -159,7 +185,18 @@ createServer(async (req, res) => {
       }
     }
     if (req.method === 'GET' && assets.has(route)) {
-      const [body, type] = assets.get(route === '/' && language !== 'nl' ? '/index.' + language + '.html' : route);
+      const [body, type, etag] = assets.get(localizedPages[route] && language !== 'nl' ? localizedPages[route] + '.' + language + '.html' : route);
+      if (route !== '/admin') {
+        // Files linked with ?v=<content hash> never change, so browsers may keep them for a year.
+        // Pages and other files are checked with the server on each visit and only downloaded again when changed.
+        const versioned = new URL(req.url, 'http://localhost').searchParams.has('v') && !type.startsWith('text/html');
+        res.setHeader('Cache-Control', versioned ? 'public, max-age=31536000, immutable' : 'no-cache');
+        res.setHeader('ETag', etag);
+        if (String(req.headers['if-none-match'] || '').split(/\s*,\s*/).includes(etag)) {
+          res.writeHead(304);
+          return res.end();
+        }
+      }
       res.writeHead(200, { 'Content-Type': type });
       if (route === '/admin') {
         let html = body.toString().replace('<html lang="en">', '<html lang="' + language + '">');

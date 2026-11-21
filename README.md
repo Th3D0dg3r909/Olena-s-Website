@@ -20,6 +20,7 @@ Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `
 | `DATABASE_PATH` | Standaard `./data/bookings.sqlite`. Gebruik op hosting een blijvend schrijfbaar pad buiten de uitrolmap en maak back-ups. |
 | `WHATSAPP_NUMBER` | Optioneel internationaal nummer met alleen cijfers. |
 | `REVIEWS_CACHE_MINUTES` | Standaard 60 (5 tot 1440). Zo lang worden Google-reviews in het geheugen bewaard. |
+| `BOOKING_RETENTION_MONTHS` | Standaard 12 (1 tot 120). Boekingen worden zo lang na de afspraakdatum automatisch verwijderd. Pas bij een andere waarde ook de privacyverklaring aan. |
 
 ## Boekingen
 
@@ -31,7 +32,15 @@ De website vraagt naam en telefoonnummer. De bevestiging verschijnt direct op de
 
 De 27 behandelingen en hun Nederlandse en Engelse teksten staan in services.json. De website biedt beide talen. De beheerplanner gebruikt Engels. Het neutrale gegenereerde sfeerbeeld toont handdoeken en verzorgingsaccessoires.
 
-Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups. Stem de privacytekst af met Olena voordat klanten de website gebruiken.
+Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups.
+
+## Privacy
+
+De privacyverklaring staat op `/privacy` in het Nederlands, Engels en Oekraïens (`public/privacy*.html`) en is gelinkt vanuit het boekingsformulier en de footer. Laat Olena de tekst controleren. Boekingen worden dagelijks en bij het starten van de server verwijderd zodra ze ouder zijn dan `BOOKING_RETENTION_MONTHS`; verlopen geblokkeerde tijdsloten worden ook opgeruimd.
+
+## Caching
+
+Bestanden die met `?v=` worden gelinkt, bewaart de browser een jaar. De server zet bij het starten elke `?v=` in de pagina's op de inhoudshash van het bestand, zodat een gewijzigd bestand altijd een nieuw adres krijgt. Pagina's en vertaalbestanden worden bij elk bezoek gecontroleerd en alleen opnieuw gedownload als ze zijn veranderd. Planner en API worden nooit bewaard.
 
 ## Google reviews
 
