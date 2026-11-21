@@ -42,7 +42,7 @@ function configuredServices() {
   return services.map(service => ({ ...service, buffer: overrides.get(service.id) ?? (service.en.category === 'BROWS & LASHES' ? 5 : 15) }));
 }
 const minutes = time => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
-function slots({ includeBlocked = false, duration = 60 } = {}) {
+function slots({ includeBlocked = false, duration = 60, days = 28 } = {}) {
   const [today, now] = local.format(new Date()).split(' ');
   const date = new Date(today + 'T00:00:00Z');
   const occupied = db.prepare("SELECT day,time,duration + buffer AS duration FROM bookings WHERE day >= ? AND status != 'declined'").all(today);
@@ -50,7 +50,7 @@ function slots({ includeBlocked = false, duration = 60 } = {}) {
     occupied.push(...db.prepare('SELECT day,time,60 AS duration FROM blocked_slots WHERE day >= ?').all(today));
   }
   const result = [];
-  for (let offset = 0; offset < 28; offset++, date.setUTCDate(date.getUTCDate() + 1)) {
+  for (let offset = 0; offset < days; offset++, date.setUTCDate(date.getUTCDate() + 1)) {
     if (![2, 4, 6].includes(date.getUTCDay())) continue;
     const day = date.toISOString().slice(0, 10);
     for (let start = 600; start <= 1140 && start + duration <= 1260; start += 15) {
@@ -72,6 +72,35 @@ function transaction(action) {
     throw error;
   }
 }
+// Olena may add appointments further ahead and in blocked time; customers book up to four weeks ahead.
+const adminSlots = duration => slots({ includeBlocked: true, duration, days: 366 });
+// Limits per visitor stop one person from filling the calendar with fake online bookings.
+const bookingLimits = [{ window: 60 * 60 * 1000, max: 3 }, { window: 24 * 60 * 60 * 1000, max: 6 }];
+const maxUpcomingPerPhone = 2;
+const bookingAttempts = new Map();
+function clientAddress(req) {
+  const socket = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
+  // Behind the host's own proxy, the last forwarded address is the visitor as seen by that proxy.
+  const local = /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$|f[cd])/.test(socket);
+  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',').map(value => value.trim()).filter(Boolean);
+  return local && forwarded.length ? forwarded.at(-1) : socket;
+}
+function bookingAllowed(address) {
+  const now = Date.now();
+  const longest = Math.max(...bookingLimits.map(limit => limit.window));
+  const recent = (bookingAttempts.get(address) || []).filter(time => now - time < longest);
+  bookingAttempts.set(address, recent);
+  return bookingLimits.every(limit => recent.filter(time => now - time < limit.window).length < limit.max);
+}
+function recordBooking(address) {
+  bookingAttempts.get(address).push(Date.now());
+}
+setInterval(() => {
+  const longest = Math.max(...bookingLimits.map(limit => limit.window));
+  for (const [address, times] of bookingAttempts) {
+    if (!times.some(time => Date.now() - time < longest)) bookingAttempts.delete(address);
+  }
+}, 60 * 60 * 1000).unref();
 const adminPassword = process.env.ADMIN_PASSWORD;
 if (adminPassword && adminPassword.length < 16) throw new Error('ADMIN_PASSWORD must be at least 16 characters.');
 const hash = (value) => createHash('sha256').update(value).digest();
@@ -163,9 +192,20 @@ createServer(async (req, res) => {
       const selected = configured.find(item => item.id === serviceId) || configured[0];
       return reply(200, { services: configured.map(item => language !== 'nl' ? { ...item, ...item[language] } : item), slots: slots({ duration: selected.duration + selected.buffer }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
+    if (req.method === 'GET' && route === '/api/admin/availability') {
+      const params = new URL(req.url, 'http://localhost').searchParams;
+      const selected = configuredServices().find(item => item.id === params.get('service'));
+      if (!selected) return reply(400, { error: 'Ongeldig verzoek.' });
+      return reply(200, adminSlots(selected.duration + selected.buffer).filter(slot => slot.day === params.get('day')).map(slot => slot.time));
+    }
     if (req.method === 'POST' && ['/api/bookings', '/api/admin/bookings'].includes(route)) {
+      const admin = route === '/api/admin/bookings';
       const body = await readBody(req).catch(() => null);
       if (!body) return reply(400, { error: 'Ongeldig verzoek.' });
+      // Hidden field that people never see; automated form fillers often complete it.
+      if (!admin && body.website) return reply(400, { error: 'Ongeldig verzoek.' });
+      const address = clientAddress(req);
+      if (!admin && !bookingAllowed(address)) return reply(429, { error: 'Je hebt al meerdere afspraken geboekt. Bel of stuur Olena een WhatsApp voor een extra afspraak.' });
       const name = typeof body.name === 'string' ? body.name.trim() : '';
       const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
       const phoneDigits = phone.replace(/\D/g, '');
@@ -174,12 +214,21 @@ createServer(async (req, res) => {
       const id = randomUUID();
       const saved = transaction(() => {
         const selected = configuredServices().find(item => item.id === body.service);
-        if (!slots({ duration: selected.duration + selected.buffer }).some(slot => slot.day === body.day && slot.time === body.time)) return false;
+        if (!admin) {
+          const [today] = local.format(new Date()).split(' ');
+          const upcoming = db.prepare("SELECT phone FROM bookings WHERE day >= ? AND status != 'declined'").all(today)
+            .filter(booking => booking.phone.replace(/\D/g, '') === phoneDigits).length;
+          if (upcoming >= maxUpcomingPerPhone) return 'phone';
+        }
+        const available = admin ? adminSlots(selected.duration + selected.buffer) : slots({ duration: selected.duration + selected.buffer });
+        if (!available.some(slot => slot.day === body.day && slot.time === body.time)) return false;
         db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration,phone,buffer) VALUES (?,?,?,?,?,?,'confirmed',?,?,?)")
           .run(id, body.day, body.time, body.service, name, '', selected.duration, phone, selected.buffer);
         return true;
       });
+      if (saved === 'phone') return reply(429, { error: 'Met dit telefoonnummer staan al twee afspraken gepland. Bel of stuur Olena een WhatsApp voor een extra afspraak.' });
       if (!saved) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
+      if (!admin) recordBooking(address);
       return reply(201, { id, status: 'confirmed', day: body.day, time: body.time, duration: services.find(item => item.id === body.service).duration });
     }
     if (route === '/api/admin/buffers' && req.method === 'GET') {

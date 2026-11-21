@@ -50,5 +50,7 @@
   "Afspraak boeken…": "Booking appointment…",
   "Je afspraak is bevestigd.": "Your appointment is confirmed.",
   "Boekingsnummer": "Booking reference",
-  "We kunnen de boeking niet controleren. Bel Olena voordat je opnieuw boekt.": "We could not verify your booking. Call Olena before booking again."
+  "We kunnen de boeking niet controleren. Bel Olena voordat je opnieuw boekt.": "We could not verify your booking. Call Olena before booking again.",
+  "Je hebt al meerdere afspraken geboekt. Bel of stuur Olena een WhatsApp voor een extra afspraak.": "You have already booked several appointments. Please call Olena or send a WhatsApp message to book another one.",
+  "Met dit telefoonnummer staan al twee afspraken gepland. Bel of stuur Olena een WhatsApp voor een extra afspraak.": "Two appointments are already booked with this phone number. Please call Olena or send a WhatsApp message to book another one."
 }

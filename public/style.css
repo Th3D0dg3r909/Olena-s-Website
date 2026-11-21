@@ -77,6 +77,7 @@ article button { margin-top: .8rem; }
 .booking-panel form { max-width: none; }
 .booking-panel form > p { font-size: .875rem; color: var(--muted); margin: 0; }
 #booking > button { width: 100%; }
+.form-trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 #whatsapp { display: inline-block; margin-top: 1rem; font-size: .9375rem; }
 #contact { background: var(--surface); }
 .studio footer { background: #493426; color: #fffaf0; padding-bottom: 6rem; font-size: .875rem; }

@@ -19,10 +19,13 @@ Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `
 | `ADMIN_PASSWORD` | Minimaal 16 tekens. |
 | `DATABASE_PATH` | Standaard `./data/bookings.sqlite`. Gebruik op hosting een blijvend schrijfbaar pad buiten de uitrolmap en maak back-ups. |
 | `WHATSAPP_NUMBER` | Optioneel internationaal nummer met alleen cijfers. |
+| `REVIEWS_CACHE_MINUTES` | Standaard 60 (5 tot 1440). Zo lang worden Google-reviews in het geheugen bewaard. |
 
 ## Boekingen
 
 Een boeking wordt direct bevestigd en reserveert de maximale behandelduur uit services.json. Starttijden zijn per kwartier beschikbaar op dinsdag, donderdag en zaterdag tussen 10.00 en 19.00 uur. Behandelingen eindigen uiterlijk om 21.00 uur. Geblokkeerde tijdsloten duren een uur. Annuleren geeft de tijd weer vrij.
+
+Tegen nepboekingen kan één bezoeker online maximaal 3 afspraken per uur en 6 per dag boeken, en staan per telefoonnummer maximaal 2 toekomstige afspraken. Een verborgen formulierveld houdt automatische invullers tegen. Olena kan in de planner zonder deze limieten afspraken toevoegen, tot een jaar vooruit en ook in geblokkeerde tijd. Dubbele afspraken blijven onmogelijk.
 
 De website vraagt naam en telefoonnummer. De bevestiging verschijnt direct op de website met boekingsnummer. Bestaande boekingen en e-mailadressen blijven in de database beschikbaar. Boekingen van vóór de duurmigratie behouden een duur van 60 minuten.
 
@@ -32,4 +35,4 @@ Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups. Stem de privacytek
 
 ## Google reviews
 
-Set GOOGLE_PLACES_API_KEY and GOOGLE_PLACE_ID in Hostinger. Enable Places API (New) and billing in Google Cloud. Restrict the key to Places API (New) and, where hosting permits, its outbound IP. Reviews load automatically on page load and are not stored in the database. Each load calls Google and may incur charges. Set an appropriate request quota in Google Cloud. Test the configured business before publishing.
+Set GOOGLE_PLACES_API_KEY and GOOGLE_PLACE_ID in Hostinger. Enable Places API (New) and billing in Google Cloud. Restrict the key to Places API (New) and, where hosting permits, its outbound IP. Reviews load automatically on page load and are not stored in the database. They are kept in memory for REVIEWS_CACHE_MINUTES and shared between visitors, so Google is called at most about once per language per period; each call may incur charges. Set an appropriate request quota in Google Cloud. Test the configured business before publishing.

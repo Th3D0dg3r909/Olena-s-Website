@@ -1,4 +1,20 @@
-export async function getReviews(language) {
+// Each Google request can cost money, so reviews are kept in memory briefly and shared between visitors.
+const cacheMinutes = Math.min(Math.max(Number(process.env.REVIEWS_CACHE_MINUTES) || 60, 5), 24 * 60);
+const failureMinutes = 5;
+const cache = new Map();
+export function getReviews(language) {
+  const cached = cache.get(language);
+  if (cached && cached.expires > Date.now()) return cached.result;
+  const result = fetchReviews(language).catch(() => ({ status: 502, data: { error: 'Google reviews are temporarily unavailable.' } }));
+  cache.set(language, { result, expires: Date.now() + cacheMinutes * 60 * 1000 });
+  result.then(value => {
+    if (value.status !== 200 && cache.get(language)?.result === result) {
+      cache.set(language, { result, expires: Date.now() + failureMinutes * 60 * 1000 });
+    }
+  });
+  return result;
+}
+async function fetchReviews(language) {
   const key = process.env.GOOGLE_PLACES_API_KEY;
   const placeId = process.env.GOOGLE_PLACE_ID;
   if (!key || !placeId) return { status: 503, data: { error: 'Reviews are not connected yet.' } };
