@@ -325,7 +325,7 @@
   {
     "category": "PROFESSIONELE PEELINGS",
     "name": "PRX-T33 Gezichtspeeling",
-    "description": "Professionele peeling voor een frissere uitstraling en een gladdere huid (PRX-T33)",
+    "description": "Biorevitaliserende peeling zonder naalden voor een directe glow, gladdere fijne lijntjes en een langdurig liftend effect.",
     "price": 110,
     "durationLabel": "30-40 min",
     "duration": 40,
@@ -333,11 +333,11 @@
     "en": {
       "category": "PROFESSIONAL PEELS",
       "name": "PRX-T33 Facial Peel",
-      "description": "Professional facial peel for refreshed, smoother-looking skin (PRX-T33)"
+      "description": "No-needle biorevitalizing peel for instant glow, smoother fine lines, and long-lasting lift."
     },
     "uk": {
       "name": "Пілінг обличчя PRX-T33",
-      "description": "Професійний пілінг для свіжого вигляду та більш гладенької шкіри (PRX-T33).",
+      "description": "Біоревіталізувальний пілінг без голок для миттєвого сяйва, розгладження дрібних зморшок і тривалого ліфтинг-ефекту.",
       "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
     }
   },
