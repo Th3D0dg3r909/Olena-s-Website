@@ -15,6 +15,7 @@ mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
 const db = new DatabaseSync(path);
 db.exec(`
   PRAGMA busy_timeout = 5000;
+  PRAGMA secure_delete = ON;
   CREATE TABLE IF NOT EXISTS bookings (
     id TEXT PRIMARY KEY, day TEXT NOT NULL, time TEXT NOT NULL, service TEXT NOT NULL,
     name TEXT NOT NULL, email TEXT NOT NULL,
@@ -316,6 +317,13 @@ createServer(async (req, res) => {
       if (!body || typeof body.id !== 'string' || !['confirmed','declined'].includes(body.status)) return reply(400, { error: 'Ongeldig verzoek.' });
       const result = db.prepare("UPDATE bookings SET status = ? WHERE id = ? AND (status = 'pending' OR (status = 'confirmed' AND ? = 'declined'))").run(body.status, body.id, body.status);
       return result.changes ? reply(200, { status: body.status }) : reply(409, { error: 'Deze aanvraag is al verwerkt of bestaat niet.' });
+    }
+    if (req.method === 'DELETE' && route === '/api/admin/bookings') {
+      // Removes a booking and the client's details completely, for example when a client asks for erasure.
+      const body = await readBody(req).catch(() => null);
+      if (!body || typeof body.id !== 'string') return reply(400, { error: 'Ongeldig verzoek.' });
+      const result = db.prepare('DELETE FROM bookings WHERE id = ?').run(body.id);
+      return result.changes ? reply(200, { deleted: true }) : reply(404, { error: 'Deze aanvraag is al verwerkt of bestaat niet.' });
     }
     return reply(404, { error: 'Pagina niet gevonden.' });
   } catch (error) {

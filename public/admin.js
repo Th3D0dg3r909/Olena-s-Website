@@ -212,6 +212,27 @@ function render() {
       }
       card.append(actions);
     }
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'delete-booking';
+    remove.textContent = t('Delete client details');
+    remove.setAttribute('aria-label', t('Delete client details') + ' — ' + booking.name + ', ' + booking.time);
+    remove.addEventListener('click', async () => {
+      const upcoming = booking.status !== 'declined' && booking.day >= planning.today;
+      const question = t('Permanently delete this booking with the name and phone number of the client? This cannot be undone.') +
+        (upcoming ? '\n\n' + t('This appointment has not taken place yet. Its time becomes available again.') : '');
+      if (!window.confirm(question)) return;
+      remove.disabled = true;
+      try {
+        await request('DELETE', { id: booking.id });
+        status.textContent = t('Client details deleted.');
+        await load();
+      } catch (error) {
+        status.textContent = error.message;
+        remove.disabled = false;
+      }
+    });
+    card.append(remove);
     return card;
   }));
   if (!dailyBookings.length) list.textContent = t("No requests or appointments on this date.");

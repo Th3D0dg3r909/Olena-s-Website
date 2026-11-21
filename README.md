@@ -36,7 +36,7 @@ Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups.
 
 ## Privacy
 
-De privacyverklaring staat op `/privacy` in het Nederlands, Engels en Oekraïens (`public/privacy*.html`) en is gelinkt vanuit het boekingsformulier en de footer. Laat Olena de tekst controleren. Boekingen worden dagelijks en bij het starten van de server verwijderd zodra ze ouder zijn dan `BOOKING_RETENTION_MONTHS`; verlopen geblokkeerde tijdsloten worden ook opgeruimd.
+De privacyverklaring staat op `/privacy` in het Nederlands, Engels en Oekraïens (`public/privacy*.html`) en is gelinkt vanuit het boekingsformulier en de footer. Laat Olena de tekst controleren. Boekingen worden dagelijks en bij het starten van de server verwijderd zodra ze ouder zijn dan `BOOKING_RETENTION_MONTHS`; verlopen geblokkeerde tijdsloten worden ook opgeruimd. Op verzoek van een klant kan Olena in de planner met **Klantgegevens verwijderen** een afspraak met naam en telefoonnummer definitief verwijderen; een toekomstige afspraak geeft daarbij de tijd weer vrij. De database overschrijft verwijderde gegevens direct (`secure_delete`).
 
 ## Caching
 

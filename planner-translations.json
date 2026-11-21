@@ -57,7 +57,11 @@
     "No available times for this date and treatment.": "Geen beschikbare tijden voor deze datum en behandeling.",
     "Saving appointment…": "Afspraak opslaan…",
     "Appointment added.": "Afspraak toegevoegd.",
-    "View website": "Bekijk website"
+    "View website": "Bekijk website",
+    "Delete client details": "Klantgegevens verwijderen",
+    "Permanently delete this booking with the name and phone number of the client? This cannot be undone.": "Deze afspraak met de naam en het telefoonnummer van de klant definitief verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "This appointment has not taken place yet. Its time becomes available again.": "Deze afspraak heeft nog niet plaatsgevonden. De tijd komt weer beschikbaar.",
+    "Client details deleted.": "Klantgegevens verwijderd."
   },
   "uk": {
     "Planning": "Планування",
@@ -117,6 +121,10 @@
     "No available times for this date and treatment.": "Для цієї дати та процедури немає доступного часу.",
     "Saving appointment…": "Збереження запису…",
     "Appointment added.": "Запис додано.",
-    "View website": "Переглянути сайт"
+    "View website": "Переглянути сайт",
+    "Delete client details": "Видалити дані клієнта",
+    "Permanently delete this booking with the name and phone number of the client? This cannot be undone.": "Остаточно видалити цей запис з ім’ям і номером телефону клієнта? Цю дію неможливо скасувати.",
+    "This appointment has not taken place yet. Its time becomes available again.": "Ця процедура ще не відбулася. Її час знову стане доступним.",
+    "Client details deleted.": "Дані клієнта видалено."
   }
 }

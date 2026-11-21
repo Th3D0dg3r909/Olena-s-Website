@@ -112,6 +112,8 @@ article button { margin-top: .8rem; }
 .planner #bookings h3 { margin: .6rem 0; font-size: 1.25rem; }
 .planner #bookings p { margin: .35rem 0; }
 .planner #bookings a { overflow-wrap: anywhere; }
+.planner #bookings .delete-booking { display: flex; background: transparent; color: #8a2c22; border-color: #c99a8f; font-size: .9375rem; }
+.planner #bookings .delete-booking:not(:disabled):hover { background: #f7e4df; }
 .salon-planner main { max-width: 100rem; padding: clamp(1rem, 3vw, 2rem); }
 .salon-planner h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin: .25rem 0; }
 .salon-planner h2 { font: 600 1rem/1.4 system-ui, sans-serif; letter-spacing: 0; }
