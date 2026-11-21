@@ -93,12 +93,21 @@ const maxUpcomingPerPhone = 2;
 const bookingAttempts = new Map();
 function clientAddress(req) {
   const socket = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
-  // Behind the host's own proxy, the last forwarded address is the visitor as seen by that proxy.
-  const local = /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$|f[cd])/.test(socket);
+  // Behind the host's own web server (LiteSpeed/Passenger connect through a local socket without an address),
+  // the last forwarded address is the visitor as seen by that server.
+  const local = !socket || /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$|f[cd])/.test(socket);
   const forwarded = String(req.headers['x-forwarded-for'] || '').split(',').map(value => value.trim()).filter(Boolean);
-  return local && forwarded.length ? forwarded.at(-1) : socket;
+  if (!local) return socket;
+  if (forwarded.length) return forwarded.at(-1);
+  // Without a visitor address every customer would share one limit, so the per-visitor limit is skipped;
+  // the limit per phone number still applies.
+  if (!warnedAboutAddress) console.warn('Visitor address unknown: per-visitor booking limit is not applied.');
+  warnedAboutAddress = true;
+  return null;
 }
+let warnedAboutAddress = false;
 function bookingAllowed(address) {
+  if (address === null) return true;
   const now = Date.now();
   const longest = Math.max(...bookingLimits.map(limit => limit.window));
   const recent = (bookingAttempts.get(address) || []).filter(time => now - time < longest);
@@ -106,7 +115,7 @@ function bookingAllowed(address) {
   return bookingLimits.every(limit => recent.filter(time => now - time < limit.window).length < limit.max);
 }
 function recordBooking(address) {
-  bookingAttempts.get(address).push(Date.now());
+  if (address !== null) bookingAttempts.get(address).push(Date.now());
 }
 setInterval(() => {
   const longest = Math.max(...bookingLimits.map(limit => limit.window));

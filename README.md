@@ -17,7 +17,7 @@ Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `
 | `PORT` | Standaard 3000. |
 | `HOST` | Standaard 0.0.0.0. |
 | `ADMIN_PASSWORD` | Minimaal 16 tekens. |
-| `DATABASE_PATH` | Standaard `./data/bookings.sqlite`. Gebruik op hosting een blijvend schrijfbaar pad buiten de uitrolmap en maak back-ups. |
+| `DATABASE_PATH` | Standaard `./data/bookings.sqlite`. Gebruik op hosting een blijvend schrijfbaar pad buiten de uitrolmap en maak back-ups. Op Hostinger staat de app in `hbuilds/current/nodejs`, dat bij elke uitrol naar een nieuwe map wijst; gebruik daar bijvoorbeeld `/home/<gebruiker>/domains/<domein>/data/bookings.sqlite`, anders begint elke uitrol met een lege database. |
 | `WHATSAPP_NUMBER` | Optioneel internationaal nummer met alleen cijfers. |
 | `REVIEWS_CACHE_MINUTES` | Standaard 60 (5 tot 1440). Zo lang worden Google-reviews in het geheugen bewaard. |
 | `BOOKING_RETENTION_MONTHS` | Standaard 12 (1 tot 120). Boekingen worden zo lang na de afspraakdatum automatisch verwijderd. Pas bij een andere waarde ook de privacyverklaring aan. |
@@ -26,7 +26,7 @@ Open http://localhost:3000. Voor `/admin` is de gebruikersnaam `olena`. Zonder `
 
 Een boeking wordt direct bevestigd en reserveert de maximale behandelduur uit services.json. Starttijden zijn per kwartier beschikbaar op dinsdag, donderdag en zaterdag tussen 10.00 en 19.00 uur. Behandelingen eindigen uiterlijk om 21.00 uur. Geblokkeerde tijdsloten duren een uur. Annuleren geeft de tijd weer vrij.
 
-Tegen nepboekingen kan één bezoeker online maximaal 3 afspraken per uur en 6 per dag boeken, en staan per telefoonnummer maximaal 2 toekomstige afspraken. Een verborgen formulierveld houdt automatische invullers tegen. Olena kan in de planner zonder deze limieten afspraken toevoegen, tot een jaar vooruit en ook in geblokkeerde tijd. Dubbele afspraken blijven onmogelijk.
+Tegen nepboekingen kan één bezoeker (herkend aan het doorgestuurde IP-adres van de webserver) online maximaal 3 afspraken per uur en 6 per dag boeken, en staan per telefoonnummer maximaal 2 toekomstige afspraken. Een verborgen formulierveld houdt automatische invullers tegen. Geeft de webserver geen bezoekersadres door, dan vervalt de limiet per bezoeker (met een melding in het log) en blijft de limiet per telefoonnummer gelden. Olena kan in de planner zonder deze limieten afspraken toevoegen, tot een jaar vooruit en ook in geblokkeerde tijd. Dubbele afspraken blijven onmogelijk.
 
 De website vraagt naam en telefoonnummer. De bevestiging verschijnt direct op de website met boekingsnummer. Bestaande boekingen en e-mailadressen blijven in de database beschikbaar. Boekingen van vóór de duurmigratie behouden een duur van 60 minuten.
 
