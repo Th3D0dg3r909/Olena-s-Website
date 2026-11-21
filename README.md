@@ -30,7 +30,7 @@ Tegen nepboekingen kan één bezoeker online maximaal 3 afspraken per uur en 6 p
 
 De website vraagt naam en telefoonnummer. De bevestiging verschijnt direct op de website met boekingsnummer. Bestaande boekingen en e-mailadressen blijven in de database beschikbaar. Boekingen van vóór de duurmigratie behouden een duur van 60 minuten.
 
-De 27 behandelingen en hun Nederlandse en Engelse teksten staan in services.json. De website biedt beide talen. De beheerplanner gebruikt Engels. Het neutrale gegenereerde sfeerbeeld toont handdoeken en verzorgingsaccessoires.
+De 27 behandelingen en hun Nederlandse en Engelse teksten staan in services.json. De website biedt beide talen. De beheerplanner gebruikt Engels. Het sfeerbeeld in de hero toont een gezichtsbehandeling met hoofdmassage in warm kaarslicht (`public/studio.webp`, 1179 × 763, en `public/studio-mobile.webp`, 640 breed); het label „Sfeerbeeld” geeft aan dat het geen foto van de studio zelf is.
 
 Gebruik voor DATABASE_PATH een blijvend pad en maak back-ups.
 
