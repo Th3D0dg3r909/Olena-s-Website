@@ -15,6 +15,7 @@ mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
 const db = new DatabaseSync(path);
 db.exec(`
   PRAGMA busy_timeout = 5000;
+  PRAGMA secure_delete = ON;
   CREATE TABLE IF NOT EXISTS bookings (
     id TEXT PRIMARY KEY, day TEXT NOT NULL, time TEXT NOT NULL, service TEXT NOT NULL,
     name TEXT NOT NULL, email TEXT NOT NULL,
@@ -42,7 +43,7 @@ function configuredServices() {
   return services.map(service => ({ ...service, buffer: overrides.get(service.id) ?? (service.en.category === 'BROWS & LASHES' ? 5 : 15) }));
 }
 const minutes = time => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
-function slots({ includeBlocked = false, duration = 60 } = {}) {
+function slots({ includeBlocked = false, duration = 60, days = 28 } = {}) {
   const [today, now] = local.format(new Date()).split(' ');
   const date = new Date(today + 'T00:00:00Z');
   const occupied = db.prepare("SELECT day,time,duration + buffer AS duration FROM bookings WHERE day >= ? AND status != 'declined'").all(today);
@@ -50,7 +51,7 @@ function slots({ includeBlocked = false, duration = 60 } = {}) {
     occupied.push(...db.prepare('SELECT day,time,60 AS duration FROM blocked_slots WHERE day >= ?').all(today));
   }
   const result = [];
-  for (let offset = 0; offset < 28; offset++, date.setUTCDate(date.getUTCDate() + 1)) {
+  for (let offset = 0; offset < days; offset++, date.setUTCDate(date.getUTCDate() + 1)) {
     if (![2, 4, 6].includes(date.getUTCDay())) continue;
     const day = date.toISOString().slice(0, 10);
     for (let start = 600; start <= 1140 && start + duration <= 1260; start += 15) {
@@ -61,6 +62,18 @@ function slots({ includeBlocked = false, duration = 60 } = {}) {
   }
   return result;
 }
+// Personal data is kept for a limited time: bookings are deleted this many months after the appointment date.
+const retentionMonths = Math.min(Math.max(Math.round(Number(process.env.BOOKING_RETENTION_MONTHS)) || 12, 1), 120);
+function removeOldData() {
+  const [today] = local.format(new Date()).split(' ');
+  const cutoff = new Date(today + 'T00:00:00Z');
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - retentionMonths);
+  const removed = db.prepare('DELETE FROM bookings WHERE day < ?').run(cutoff.toISOString().slice(0, 10)).changes;
+  db.prepare('DELETE FROM blocked_slots WHERE day < ?').run(today);
+  if (removed) console.log('Removed ' + removed + ' bookings older than ' + retentionMonths + ' months.');
+}
+removeOldData();
+setInterval(removeOldData, 24 * 60 * 60 * 1000).unref();
 function transaction(action) {
   db.exec('BEGIN IMMEDIATE');
   try {
@@ -72,12 +85,53 @@ function transaction(action) {
     throw error;
   }
 }
+// Olena may add appointments further ahead and in blocked time; customers book up to four weeks ahead.
+const adminSlots = duration => slots({ includeBlocked: true, duration, days: 366 });
+// Limits per visitor stop one person from filling the calendar with fake online bookings.
+const bookingLimits = [{ window: 60 * 60 * 1000, max: 3 }, { window: 24 * 60 * 60 * 1000, max: 6 }];
+const maxUpcomingPerPhone = 2;
+const bookingAttempts = new Map();
+function clientAddress(req) {
+  const socket = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
+  // Behind the host's own web server (LiteSpeed/Passenger connect through a local socket without an address),
+  // the last forwarded address is the visitor as seen by that server.
+  const local = !socket || /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$|f[cd])/.test(socket);
+  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',').map(value => value.trim()).filter(Boolean);
+  if (!local) return socket;
+  if (forwarded.length) return forwarded.at(-1);
+  // Without a visitor address every customer would share one limit, so the per-visitor limit is skipped;
+  // the limit per phone number still applies.
+  if (!warnedAboutAddress) console.warn('Visitor address unknown: per-visitor booking limit is not applied.');
+  warnedAboutAddress = true;
+  return null;
+}
+let warnedAboutAddress = false;
+function bookingAllowed(address) {
+  if (address === null) return true;
+  const now = Date.now();
+  const longest = Math.max(...bookingLimits.map(limit => limit.window));
+  const recent = (bookingAttempts.get(address) || []).filter(time => now - time < longest);
+  bookingAttempts.set(address, recent);
+  return bookingLimits.every(limit => recent.filter(time => now - time < limit.window).length < limit.max);
+}
+function recordBooking(address) {
+  if (address !== null) bookingAttempts.get(address).push(Date.now());
+}
+setInterval(() => {
+  const longest = Math.max(...bookingLimits.map(limit => limit.window));
+  for (const [address, times] of bookingAttempts) {
+    if (!times.some(time => Date.now() - time < longest)) bookingAttempts.delete(address);
+  }
+}, 60 * 60 * 1000).unref();
 const adminPassword = process.env.ADMIN_PASSWORD;
 if (adminPassword && adminPassword.length < 16) throw new Error('ADMIN_PASSWORD must be at least 16 characters.');
 const hash = (value) => createHash('sha256').update(value).digest();
 const adminHash = adminPassword && hash('Basic ' + Buffer.from('olena:' + adminPassword).toString('base64'));
 const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
+  '/privacy': ['privacy.html', 'text/html; charset=utf-8'],
+  '/privacy.en.html': ['privacy.en.html', 'text/html; charset=utf-8'],
+  '/privacy.uk.html': ['privacy.uk.html', 'text/html; charset=utf-8'],
   '/index.uk.html': ['index.uk.html', 'text/html; charset=utf-8'],
   '/translations.uk.json': ['../translations.uk.json', 'application/json; charset=utf-8'],
   '/index.en.html': ['index.en.html', 'text/html; charset=utf-8'],
@@ -88,6 +142,7 @@ const assets = new Map(Object.entries({
   '/logo.webp': ['logo.webp', 'image/webp'],
   '/studio-mobile.webp': ['studio-mobile.webp', 'image/webp'],
   '/logo.png': ['logo.png', 'image/png'],
+  '/logo-transparent.svg': ['logo-transparent.svg', 'image/svg+xml'],
   '/studio.webp': ['studio.webp', 'image/webp'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/reviews.js': ['reviews.js', 'text/javascript; charset=utf-8'],
@@ -95,7 +150,18 @@ const assets = new Map(Object.entries({
   '/admin': ['admin.html', 'text/html; charset=utf-8'],
   '/planner-translations.json': ['../planner-translations.json', 'application/json; charset=utf-8'],
   '/admin.js': ['admin.js', 'text/javascript; charset=utf-8'],
-}).map(([route, [file,type]]) => [route,[readFileSync(new URL('./public/' + file, import.meta.url)),type]]));
+}).map(([route, [file,type]]) => [route, [readFileSync(new URL('./public/' + file, import.meta.url)), type]]));
+// Each ?v= in a page is set to the linked file's content hash at startup, so an edited file always gets a new
+// address and browsers never keep an outdated copy, even though linked files are cached for a year.
+const versions = new Map([...assets].map(([route, [body]]) => [route, createHash('sha256').update(body).digest('hex').slice(0, 12)]));
+for (const [route, entry] of assets) {
+  if (entry[1].startsWith('text/html')) {
+    entry[0] = Buffer.from(entry[0].toString().replace(/(\/[\w.-]+)\?v=[\w-]+/g, (link, path) => versions.has(path) ? path + '?v=' + versions.get(path) : link));
+  }
+  entry.push('"' + createHash('sha256').update(entry[0]).digest('base64url').slice(0, 22) + '"');
+}
+// Pages that exist in Dutch, English and Ukrainian; ?lang= picks the file.
+const localizedPages = { '/': '/index', '/privacy': '/privacy' };
 async function readBody(req) {
   if (req.headers['content-type'] !== 'application/json' || req.headers['x-olena-request'] !== '1') throw new Error('Ongeldig verzoek.');
   let body = '';
@@ -129,7 +195,18 @@ createServer(async (req, res) => {
       }
     }
     if (req.method === 'GET' && assets.has(route)) {
-      const [body, type] = assets.get(route === '/' && language !== 'nl' ? '/index.' + language + '.html' : route);
+      const [body, type, etag] = assets.get(localizedPages[route] && language !== 'nl' ? localizedPages[route] + '.' + language + '.html' : route);
+      if (route !== '/admin') {
+        // Files linked with ?v=<content hash> never change, so browsers may keep them for a year.
+        // Pages and other files are checked with the server on each visit and only downloaded again when changed.
+        const versioned = new URL(req.url, 'http://localhost').searchParams.has('v') && !type.startsWith('text/html');
+        res.setHeader('Cache-Control', versioned ? 'public, max-age=31536000, immutable' : 'no-cache');
+        res.setHeader('ETag', etag);
+        if (String(req.headers['if-none-match'] || '').split(/\s*,\s*/).includes(etag)) {
+          res.writeHead(304);
+          return res.end();
+        }
+      }
       res.writeHead(200, { 'Content-Type': type });
       if (route === '/admin') {
         let html = body.toString().replace('<html lang="en">', '<html lang="' + language + '">');
@@ -162,9 +239,20 @@ createServer(async (req, res) => {
       const selected = configured.find(item => item.id === serviceId) || configured[0];
       return reply(200, { services: configured.map(item => language !== 'nl' ? { ...item, ...item[language] } : item), slots: slots({ duration: selected.duration + selected.buffer }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
     }
+    if (req.method === 'GET' && route === '/api/admin/availability') {
+      const params = new URL(req.url, 'http://localhost').searchParams;
+      const selected = configuredServices().find(item => item.id === params.get('service'));
+      if (!selected) return reply(400, { error: 'Ongeldig verzoek.' });
+      return reply(200, adminSlots(selected.duration + selected.buffer).filter(slot => slot.day === params.get('day')).map(slot => slot.time));
+    }
     if (req.method === 'POST' && ['/api/bookings', '/api/admin/bookings'].includes(route)) {
+      const admin = route === '/api/admin/bookings';
       const body = await readBody(req).catch(() => null);
       if (!body) return reply(400, { error: 'Ongeldig verzoek.' });
+      // Hidden field that people never see; automated form fillers often complete it.
+      if (!admin && body.website) return reply(400, { error: 'Ongeldig verzoek.' });
+      const address = clientAddress(req);
+      if (!admin && !bookingAllowed(address)) return reply(429, { error: 'Je hebt al meerdere afspraken geboekt. Bel of stuur Olena een WhatsApp voor een extra afspraak.' });
       const name = typeof body.name === 'string' ? body.name.trim() : '';
       const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
       const phoneDigits = phone.replace(/\D/g, '');
@@ -173,12 +261,21 @@ createServer(async (req, res) => {
       const id = randomUUID();
       const saved = transaction(() => {
         const selected = configuredServices().find(item => item.id === body.service);
-        if (!slots({ duration: selected.duration + selected.buffer }).some(slot => slot.day === body.day && slot.time === body.time)) return false;
+        if (!admin) {
+          const [today] = local.format(new Date()).split(' ');
+          const upcoming = db.prepare("SELECT phone FROM bookings WHERE day >= ? AND status != 'declined'").all(today)
+            .filter(booking => booking.phone.replace(/\D/g, '') === phoneDigits).length;
+          if (upcoming >= maxUpcomingPerPhone) return 'phone';
+        }
+        const available = admin ? adminSlots(selected.duration + selected.buffer) : slots({ duration: selected.duration + selected.buffer });
+        if (!available.some(slot => slot.day === body.day && slot.time === body.time)) return false;
         db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration,phone,buffer) VALUES (?,?,?,?,?,?,'confirmed',?,?,?)")
           .run(id, body.day, body.time, body.service, name, '', selected.duration, phone, selected.buffer);
         return true;
       });
+      if (saved === 'phone') return reply(429, { error: 'Met dit telefoonnummer staan al twee afspraken gepland. Bel of stuur Olena een WhatsApp voor een extra afspraak.' });
       if (!saved) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
+      if (!admin) recordBooking(address);
       return reply(201, { id, status: 'confirmed', day: body.day, time: body.time, duration: services.find(item => item.id === body.service).duration });
     }
     if (route === '/api/admin/buffers' && req.method === 'GET') {
@@ -229,6 +326,13 @@ createServer(async (req, res) => {
       if (!body || typeof body.id !== 'string' || !['confirmed','declined'].includes(body.status)) return reply(400, { error: 'Ongeldig verzoek.' });
       const result = db.prepare("UPDATE bookings SET status = ? WHERE id = ? AND (status = 'pending' OR (status = 'confirmed' AND ? = 'declined'))").run(body.status, body.id, body.status);
       return result.changes ? reply(200, { status: body.status }) : reply(409, { error: 'Deze aanvraag is al verwerkt of bestaat niet.' });
+    }
+    if (req.method === 'DELETE' && route === '/api/admin/bookings') {
+      // Removes a booking and the client's details completely, for example when a client asks for erasure.
+      const body = await readBody(req).catch(() => null);
+      if (!body || typeof body.id !== 'string') return reply(400, { error: 'Ongeldig verzoek.' });
+      const result = db.prepare('DELETE FROM bookings WHERE id = ?').run(body.id);
+      return result.changes ? reply(200, { deleted: true }) : reply(404, { error: 'Deze aanvraag is al verwerkt of bestaat niet.' });
     }
     return reply(404, { error: 'Pagina niet gevonden.' });
   } catch (error) {

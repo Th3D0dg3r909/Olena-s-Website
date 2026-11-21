@@ -212,6 +212,27 @@ function render() {
       }
       card.append(actions);
     }
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'delete-booking';
+    remove.textContent = t('Delete client details');
+    remove.setAttribute('aria-label', t('Delete client details') + ' — ' + booking.name + ', ' + booking.time);
+    remove.addEventListener('click', async () => {
+      const upcoming = booking.status !== 'declined' && booking.day >= planning.today;
+      const question = t('Permanently delete this booking with the name and phone number of the client? This cannot be undone.') +
+        (upcoming ? '\n\n' + t('This appointment has not taken place yet. Its time becomes available again.') : '');
+      if (!window.confirm(question)) return;
+      remove.disabled = true;
+      try {
+        await request('DELETE', { id: booking.id });
+        status.textContent = t('Client details deleted.');
+        await load();
+      } catch (error) {
+        status.textContent = error.message;
+        remove.disabled = false;
+      }
+    });
+    card.append(remove);
     return card;
   }));
   if (!dailyBookings.length) list.textContent = t("No requests or appointments on this date.");
@@ -249,14 +270,13 @@ async function refreshManualAvailability() {
   if (!manualForm.elements.service.value || !manualForm.elements.day.value) return;
   manualStatus.textContent = t('Loading available times…');
   try {
-    const response = await fetch('/api/options?lang=' + language + '&service=' + encodeURIComponent(manualForm.elements.service.value));
+    const response = await fetch('/api/admin/availability?lang=' + language + '&service=' + encodeURIComponent(manualForm.elements.service.value) + '&day=' + encodeURIComponent(manualForm.elements.day.value));
     if (!response.ok) throw new Error(t('Could not load available times.'));
-    const options = await response.json();
+    const times = await response.json();
     if (sequence !== availabilitySequence) return;
-    const slots = options.slots.filter(slot => slot.day === manualForm.elements.day.value);
-    manualForm.elements.time.replaceChildren(...slots.map(slot => new Option(slot.time, slot.time)));
-    manualStatus.textContent = slots.length ? '' : t('No available times for this date and treatment.');
-    manualSave.disabled = savingAppointment || !slots.length;
+    manualForm.elements.time.replaceChildren(...times.map(time => new Option(time, time)));
+    manualStatus.textContent = times.length ? '' : t('No available times for this date and treatment.');
+    manualSave.disabled = savingAppointment || !times.length;
   } catch (error) {
     if (sequence === availabilitySequence) manualStatus.textContent = error.message;
   }

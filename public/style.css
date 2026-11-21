@@ -77,9 +77,15 @@ article button { margin-top: .8rem; }
 .booking-panel form { max-width: none; }
 .booking-panel form > p { font-size: .875rem; color: var(--muted); margin: 0; }
 #booking > button { width: 100%; }
+.form-trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 #whatsapp { display: inline-block; margin-top: 1rem; font-size: .9375rem; }
 #contact { background: var(--surface); }
 .studio footer { background: #493426; color: #fffaf0; padding-bottom: 6rem; font-size: .875rem; }
+.studio footer a { color: inherit; text-underline-offset: .2em; }
+.privacy-page section { max-width: 46rem; }
+.privacy-page h1 { margin-bottom: .25rem; }
+.privacy-page h2 { margin-top: 2rem; }
+.privacy-updated { color: var(--muted); font-size: .875rem; }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
   button, .button { transition: background-color .15s ease; }
@@ -106,6 +112,8 @@ article button { margin-top: .8rem; }
 .planner #bookings h3 { margin: .6rem 0; font-size: 1.25rem; }
 .planner #bookings p { margin: .35rem 0; }
 .planner #bookings a { overflow-wrap: anywhere; }
+.planner #bookings .delete-booking { display: flex; background: transparent; color: #8a2c22; border-color: #c99a8f; font-size: .9375rem; }
+.planner #bookings .delete-booking:not(:disabled):hover { background: #f7e4df; }
 .salon-planner main { max-width: 100rem; padding: clamp(1rem, 3vw, 2rem); }
 .salon-planner h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin: .25rem 0; }
 .salon-planner h2 { font: 600 1rem/1.4 system-ui, sans-serif; letter-spacing: 0; }
