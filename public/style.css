@@ -70,15 +70,15 @@ article button { margin-top: .8rem; }
 #behandelingen article .treatment-category { margin: 0 0 1rem; color: var(--muted); font-size: .875rem; letter-spacing: .055em; }
 #behandelingen article .treatment-description { flex: 1; margin-block: 1rem; }
 #behandelingen article strong { padding-top: .5rem; color: var(--accent); }
-#behandelingen article button { width: 100%; }
+#behandelingen article .treatment-request { width: 100%; margin-top: .8rem; text-align: center; }
 .booking-section { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(1.5rem, 5vw, 4rem); background: var(--soft); }
 .booking-section > div:first-child p { max-width: 38ch; }
 .booking-panel { background: var(--surface); padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
-.booking-panel form { max-width: none; }
-.booking-panel form > p { font-size: .875rem; color: var(--muted); margin: 0; }
-#booking > button { width: 100%; }
-.form-trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
-#whatsapp { display: inline-block; margin-top: 1rem; font-size: .9375rem; }
+.request-panel { display: grid; gap: 1rem; }
+.request-panel .whatsapp-request { width: 100%; text-align: center; }
+.request-panel p { margin: 0; }
+.request-note, .request-call { font-size: .875rem; color: var(--muted); }
+.response-time { font-weight: 500; color: var(--accent); }
 #contact { background: var(--surface); }
 .studio footer { background: #493426; color: #fffaf0; padding-bottom: 6rem; font-size: .875rem; }
 .studio footer a { color: inherit; text-underline-offset: .2em; }
@@ -118,6 +118,16 @@ article button { margin-top: .8rem; }
 .salon-planner h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin: .25rem 0; }
 .salon-planner h2 { font: 600 1rem/1.4 system-ui, sans-serif; letter-spacing: 0; }
 .salon-planner header { padding-inline: clamp(1rem, 3vw, 2rem); }
+.logout-button { min-height: 44px; padding: .45rem 1rem; background: transparent; color: var(--ink); border-color: var(--line); }
+.logout-button:not(:disabled):hover { background: #f7e7dc; }
+.login-panel { max-width: 26rem; margin: clamp(1rem, 6vh, 4rem) auto; padding: clamp(1.25rem, 4vw, 2rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; }
+.login-panel form { margin: 1.25rem auto 0; text-align: left; }
+.login-panel form button { width: 100%; }
+.login-logo { display: block; height: 96px; width: auto; margin: 0 auto .5rem; }
+.login-panel h1 { margin: .25rem 0 .75rem; }
+.login-notice { padding: .65rem .85rem; border-radius: .65rem; background: #f8e9c6; color: #644617; text-align: left; }
+.login-help { color: var(--muted); font-size: .875rem; }
+#login-status { min-height: 1.5em; margin-top: 1rem; }
 .calendar-subtitle { color: var(--muted); margin: .4rem 0 1.5rem; }
 .planner-help { padding: 0 1.25rem; margin-block: .75rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
 .planner-help > summary { padding-block: 1rem; cursor: pointer; font-weight: 600; min-height: 48px; }
@@ -1539,11 +1549,10 @@ input, select { max-width: 100%; min-width: 0; width: 100%; font-size: 1rem; }
   .hero-photo img { object-position: 65% center; }
   .hero-photo figcaption { bottom: .5rem; }
   .studio .actions { flex-direction: column; align-items: stretch; }
-  .studio .actions .button, #behandelingen article button, #booking > button { width: 100%; text-align: center; }
+  .studio .actions .button { width: 100%; text-align: center; }
   .studio section { padding-inline: 5vw; }
   .studio .cards, .studio .review-grid { grid-template-columns: minmax(0, 1fr); }
   .studio .studio-logo { width: 88px; height: auto; margin-bottom: 1rem; }
-  #behandelingen article button { margin-inline: 0; }
   #google-reviews .review-card { padding: 1rem; }
   .review-author { flex-wrap: wrap; }
   .review-attribution { line-height: 2; overflow-wrap: anywhere; }

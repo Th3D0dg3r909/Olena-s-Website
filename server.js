@@ -1,6 +1,7 @@
 import { getReviews } from './reviews.js';
+import { createAuth } from './auth.js';
 import { createServer } from 'node:http';
-import { randomUUID, createHash, timingSafeEqual } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -85,48 +86,39 @@ function transaction(action) {
     throw error;
   }
 }
-// Olena may add appointments further ahead and in blocked time; customers book up to four weeks ahead.
+// Olena adds confirmed appointments herself, up to a year ahead and also in time she blocked.
 const adminSlots = duration => slots({ includeBlocked: true, duration, days: 366 });
-// Limits per visitor stop one person from filling the calendar with fake online bookings.
-const bookingLimits = [{ window: 60 * 60 * 1000, max: 3 }, { window: 24 * 60 * 60 * 1000, max: 6 }];
-const maxUpcomingPerPhone = 2;
-const bookingAttempts = new Map();
 function clientAddress(req) {
   const socket = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
   // Behind the host's own web server (LiteSpeed/Passenger connect through a local socket without an address),
-  // the last forwarded address is the visitor as seen by that server.
+  // the last forwarded address is the visitor as seen by that server. Unknown addresses return null.
   const local = !socket || /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$|f[cd])/.test(socket);
   const forwarded = String(req.headers['x-forwarded-for'] || '').split(',').map(value => value.trim()).filter(Boolean);
   if (!local) return socket;
-  if (forwarded.length) return forwarded.at(-1);
-  // Without a visitor address every customer would share one limit, so the per-visitor limit is skipped;
-  // the limit per phone number still applies.
-  if (!warnedAboutAddress) console.warn('Visitor address unknown: per-visitor booking limit is not applied.');
-  warnedAboutAddress = true;
-  return null;
+  return forwarded.length ? forwarded.at(-1) : null;
 }
-let warnedAboutAddress = false;
-function bookingAllowed(address) {
-  if (address === null) return true;
-  const now = Date.now();
-  const longest = Math.max(...bookingLimits.map(limit => limit.window));
-  const recent = (bookingAttempts.get(address) || []).filter(time => now - time < longest);
-  bookingAttempts.set(address, recent);
-  return bookingLimits.every(limit => recent.filter(time => now - time < limit.window).length < limit.max);
-}
-function recordBooking(address) {
-  if (address !== null) bookingAttempts.get(address).push(Date.now());
-}
-setInterval(() => {
-  const longest = Math.max(...bookingLimits.map(limit => limit.window));
-  for (const [address, times] of bookingAttempts) {
-    if (!times.some(time => Date.now() - time < longest)) bookingAttempts.delete(address);
+
+// Public address of the website. The concept site and the final domain each set their own PUBLIC_URL.
+function configuredUrl(value) {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (!['https:', 'http:'].includes(url.protocol) || url.pathname !== '/' || url.search || url.hash) throw new Error();
+    return url;
+  } catch {
+    console.error('PUBLIC_URL is ignored: use a full address such as https://www.example.nl without a path.');
+    return null;
   }
-}, 60 * 60 * 1000).unref();
-const adminPassword = process.env.ADMIN_PASSWORD;
-if (adminPassword && adminPassword.length < 16) throw new Error('ADMIN_PASSWORD must be at least 16 characters.');
-const hash = (value) => createHash('sha256').update(value).digest();
-const adminHash = adminPassword && hash('Basic ' + Buffer.from('olena:' + adminPassword).toString('base64'));
+}
+const publicUrl = configuredUrl(process.env.PUBLIC_URL);
+// Search engines are kept out unless ALLOW_INDEXING=true is set on the approved production site.
+const allowIndexing = process.env.ALLOW_INDEXING === 'true';
+const redirectToPublicUrl = process.env.REDIRECT_TO_PUBLIC_URL === 'true' && publicUrl !== null;
+const secureCookies = publicUrl ? publicUrl.protocol === 'https:' : process.env.COOKIE_SECURE !== 'false';
+const whatsappNumber = /^\d{8,15}$/.test(process.env.WHATSAPP_NUMBER || '') ? process.env.WHATSAPP_NUMBER : '31647238444';
+const auth = createAuth({ db, secureCookies });
+setInterval(() => auth.removeExpired(), 60 * 60 * 1000).unref();
+
 const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/privacy': ['privacy.html', 'text/html; charset=utf-8'],
@@ -148,15 +140,32 @@ const assets = new Map(Object.entries({
   '/reviews.js': ['reviews.js', 'text/javascript; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/admin': ['admin.html', 'text/html; charset=utf-8'],
+  // Not reachable by its own address: shown at /admin until Olena is logged in.
+  'login.html': ['login.html', 'text/html; charset=utf-8'],
+  '/login.js': ['login.js', 'text/javascript; charset=utf-8'],
   '/planner-translations.json': ['../planner-translations.json', 'application/json; charset=utf-8'],
   '/admin.js': ['admin.js', 'text/javascript; charset=utf-8'],
 }).map(([route, [file,type]]) => [route, [readFileSync(new URL('./public/' + file, import.meta.url)), type]]));
 // Each ?v= in a page is set to the linked file's content hash at startup, so an edited file always gets a new
 // address and browsers never keep an outdated copy, even though linked files are cached for a year.
 const versions = new Map([...assets].map(([route, [body]]) => [route, createHash('sha256').update(body).digest('hex').slice(0, 12)]));
+// Public pages in each language, with their address on the public site for canonical links and the sitemap.
+const publicPages = [['/', '/'], ['/index.en.html', '/?lang=en'], ['/index.uk.html', '/?lang=uk'],
+  ['/privacy', '/privacy'], ['/privacy.en.html', '/privacy?lang=en'], ['/privacy.uk.html', '/privacy?lang=uk']];
+const languageOf = address => address.match(/lang=(\w+)/)?.[1] || 'nl';
+function alternates(address) {
+  const base = address.split('?')[0];
+  const links = publicPages.filter(([, other]) => other.split('?')[0] === base)
+    .map(([, other]) => '<link rel="alternate" hreflang="' + languageOf(other) + '" href="' + new URL(other, publicUrl).href + '">');
+  return '<link rel="canonical" href="' + new URL(address, publicUrl).href + '">' + links.join('') +
+    '<link rel="alternate" hreflang="x-default" href="' + new URL(base, publicUrl).href + '">';
+}
 for (const [route, entry] of assets) {
   if (entry[1].startsWith('text/html')) {
-    entry[0] = Buffer.from(entry[0].toString().replace(/(\/[\w.-]+)\?v=[\w-]+/g, (link, path) => versions.has(path) ? path + '?v=' + versions.get(path) : link));
+    let html = entry[0].toString().replace(/(\/[\w.-]+)\?v=[\w-]+/g, (link, path) => versions.has(path) ? path + '?v=' + versions.get(path) : link);
+    const page = publicPages.find(([file]) => file === route);
+    if (page && publicUrl) html = html.replace('</head>', alternates(page[1]) + '\n</head>');
+    entry[0] = Buffer.from(html);
   }
   entry.push('"' + createHash('sha256').update(entry[0]).digest('base64url').slice(0, 22) + '"');
 }
@@ -173,55 +182,118 @@ async function readBody(req) {
   if (!value || typeof value !== 'object') throw new Error('Ongeldig verzoek.');
   return value;
 }
+// Planner and login pages are written in English and translated by replacing known texts.
+function plannerPage(file, language, replacements = {}) {
+  let html = assets.get(file)[0].toString().replace('<html lang="en">', '<html lang="' + language + '">');
+  for (const [from, to] of Object.entries(replacements)) html = html.replace(from, to);
+  if (language !== 'en') {
+    const translations = plannerTranslations[language];
+    const pattern = Object.keys(translations).sort((a,b) => b.length - a.length)
+      .map(text => text.replace(/[.*+?^$\{\}()|[\]\\]/g, '\\$&')).join('|');
+    html = html.replace(new RegExp(pattern, 'g'), text => translations[text]);
+  }
+  html = html.replaceAll('href="/?lang=en"', 'href="/?lang=' + language + '"');
+  html = html.replaceAll(' aria-current="page"', '');
+  html = html.replace('href="/admin?lang=' + language + '"', 'aria-current="page" href="/admin?lang=' + language + '"');
+  return html.replace('<!--PLANNER_HELP-->', plannerHelp[language]);
+}
+// Requests that change data must come from this website itself, never from another site.
+function sameSite(req) {
+  // Browsers set Sec-Fetch-Site themselves and pages cannot change it; older browsers are checked by Origin.
+  const site = req.headers['sec-fetch-site'];
+  if (site) return site === 'same-origin' || site === 'none';
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  try {
+    return origin === publicUrl?.origin || new URL(origin).host === req.headers.host;
+  } catch {
+    return false;
+  }
+}
+function sitemap() {
+  const entries = publicPages.map(([, address]) => '  <url><loc>' + new URL(address, publicUrl).href.replaceAll('&', '&amp;') + '</loc>' +
+    publicPages.filter(([, other]) => other.split('?')[0] === address.split('?')[0])
+      .map(([, other]) => '<xhtml:link rel="alternate" hreflang="' + languageOf(other) + '" href="' + new URL(other, publicUrl).href + '"/>').join('') + '</url>');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' + entries.join('\n') + '\n</urlset>\n';
+}
 createServer(async (req, res) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' https://*.googleusercontent.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Cache-Control', 'no-store');
+  const route = req.url.split('?')[0];
+  const privateRoute = route === '/admin' || route.startsWith('/api/');
+  // The concept site is never indexed; the approved production site sets ALLOW_INDEXING=true.
+  if (!allowIndexing || privateRoute) res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  if (redirectToPublicUrl && req.headers.host !== publicUrl.host) {
+    res.writeHead(301, { Location: publicUrl.origin + req.url });
+    return res.end();
+  }
   const requestedLanguage = new URL(req.url, 'http://localhost').searchParams.get('lang');
-  const language = ['nl', 'en', 'uk'].includes(requestedLanguage) ? requestedLanguage : (req.url.split('?')[0] === '/admin' ? 'en' : 'nl');
-  const english = language === 'en';
+  const language = ['nl', 'en', 'uk'].includes(requestedLanguage) ? requestedLanguage : (route === '/admin' ? 'en' : 'nl');
   const reply = (status, data) => {
     if (language !== 'nl' && data?.error) data = { ...data, error: (language === 'uk' ? ukrainianTranslations : translations)[data.error] || data.error };
     res.writeHead(status, {'Content-Type': 'application/json; charset=utf-8'});
     res.end(JSON.stringify(data));
   };
-  const route = req.url.split('?')[0];
   try {
-    if (route === '/admin' || route.startsWith('/api/admin/')) {
-      if (!adminHash) return reply(503, { error: 'Beheer is nog niet ingesteld.' });
-      if (!timingSafeEqual(adminHash, hash(req.headers.authorization || ''))) {
-        res.setHeader('WWW-Authenticate', 'Basic realm="Olena Studio", charset="UTF-8"');
-        return reply(401, { error: 'Log in om afspraken te beheren.' });
+    const adminApi = route.startsWith('/api/admin/');
+    if ((adminApi || route.startsWith('/api/auth/')) && (!sameSite(req) ||
+        (!['GET', 'HEAD'].includes(req.method) && req.headers['x-olena-request'] !== '1'))) {
+      return reply(403, { error: 'Dit verzoek is geweigerd omdat het niet van deze website komt.' });
+    }
+    if (adminApi) {
+      if (!auth.configured) return reply(503, { error: 'Inloggen voor beheer is niet ingesteld.', code: 'not_configured' });
+      const state = auth.session(req);
+      if (state === 'expired') res.setHeader('Set-Cookie', auth.clearCookie());
+      if (state !== 'valid') {
+        return reply(401, state === 'expired'
+          ? { error: 'Je sessie is verlopen. Log opnieuw in.', code: 'session_expired' }
+          : { error: 'Log in om afspraken te beheren.', code: 'login_required' });
       }
     }
-    if (req.method === 'GET' && assets.has(route)) {
+    if (req.method === 'GET' && route === '/admin') {
+      const state = auth.configured ? auth.session(req) : 'not-configured';
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      if (state === 'valid') return res.end(plannerPage('/admin', language));
+      if (state === 'expired') res.setHeader('Set-Cookie', auth.clearCookie());
+      // Nothing about appointments or clients is sent before login.
+      return res.end(plannerPage('login.html', language, { 'data-state=""': 'data-state="' + state + '"' }));
+    }
+    if (req.method === 'POST' && route === '/api/auth/login') {
+      const body = await readBody(req).catch(() => null);
+      if (!body) return reply(400, { error: 'Ongeldig verzoek.' });
+      const result = await auth.login(body, clientAddress(req));
+      if (result.retryAfter) res.setHeader('Retry-After', String(result.retryAfter));
+      if (result.ok) res.setHeader('Set-Cookie', result.cookie);
+      return reply(result.status, result.ok ? { ok: true } : { error: result.error });
+    }
+    if (req.method === 'POST' && route === '/api/auth/logout') {
+      res.setHeader('Set-Cookie', auth.logout(req));
+      return reply(200, { ok: true });
+    }
+    if (req.method === 'GET' && route === '/robots.txt') {
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end(allowIndexing
+        ? 'User-agent: *\nDisallow: /admin\nDisallow: /api/\n' + (publicUrl ? 'Sitemap: ' + new URL('/sitemap.xml', publicUrl).href + '\n' : '')
+        : 'User-agent: *\nDisallow: /\n');
+    }
+    if (req.method === 'GET' && route === '/sitemap.xml' && publicUrl) {
+      res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8' });
+      return res.end(sitemap());
+    }
+    if (req.method === 'GET' && assets.has(route) && route !== '/admin') {
       const [body, type, etag] = assets.get(localizedPages[route] && language !== 'nl' ? localizedPages[route] + '.' + language + '.html' : route);
-      if (route !== '/admin') {
-        // Files linked with ?v=<content hash> never change, so browsers may keep them for a year.
-        // Pages and other files are checked with the server on each visit and only downloaded again when changed.
-        const versioned = new URL(req.url, 'http://localhost').searchParams.has('v') && !type.startsWith('text/html');
-        res.setHeader('Cache-Control', versioned ? 'public, max-age=31536000, immutable' : 'no-cache');
-        res.setHeader('ETag', etag);
-        if (String(req.headers['if-none-match'] || '').split(/\s*,\s*/).includes(etag)) {
-          res.writeHead(304);
-          return res.end();
-        }
+      // Files linked with ?v=<content hash> never change, so browsers may keep them for a year.
+      // Pages and other files are checked with the server on each visit and only downloaded again when changed.
+      const versioned = new URL(req.url, 'http://localhost').searchParams.has('v') && !type.startsWith('text/html');
+      res.setHeader('Cache-Control', versioned ? 'public, max-age=31536000, immutable' : 'no-cache');
+      res.setHeader('ETag', etag);
+      if (String(req.headers['if-none-match'] || '').split(/\s*,\s*/).includes(etag)) {
+        res.writeHead(304);
+        return res.end();
       }
       res.writeHead(200, { 'Content-Type': type });
-      if (route === '/admin') {
-        let html = body.toString().replace('<html lang="en">', '<html lang="' + language + '">');
-        if (language !== 'en') {
-          const translations = plannerTranslations[language];
-          const pattern = Object.keys(translations).sort((a,b) => b.length - a.length)
-            .map(text => text.replace(/[.*+?^$\{\}()|[\]\\]/g, '\\$&')).join('|');
-          html = html.replace(new RegExp(pattern, 'g'), text => translations[text]);
-        }
-        html = html.replaceAll('href="/?lang=en"', 'href="/?lang=' + language + '"');
-        html = html.replaceAll(' aria-current="page"', '');
-        html = html.replace('href="/admin?lang=' + language + '"', 'aria-current="page" href="/admin?lang=' + language + '"');
-        html = html.replace('<!--PLANNER_HELP-->', plannerHelp[language]);
-        return res.end(html);
-      }
       return res.end(body);
     }
     if (req.method === 'GET' && route === '/api/reviews') {
@@ -233,11 +305,13 @@ createServer(async (req, res) => {
       }
     }
     if (req.method === 'GET' && route === '/api/options') {
-      const whatsapp = process.env.WHATSAPP_NUMBER || '';
-      const serviceId = new URL(req.url, 'http://localhost').searchParams.get('service');
-      const configured = configuredServices();
-      const selected = configured.find(item => item.id === serviceId) || configured[0];
-      return reply(200, { services: configured.map(item => language !== 'nl' ? { ...item, ...item[language] } : item), slots: slots({ duration: selected.duration + selected.buffer }), whatsapp: /^\d{8,15}$/.test(whatsapp) ? whatsapp : '' });
+      // Treatments and the business WhatsApp number; customers request appointments, they do not book them.
+      return reply(200, {
+        services: services.map(({ id, category, name, description, price, durationLabel, ...item }) => ({
+          id, price, ...(language === 'nl' ? { category, name, description } : item[language]), durationLabel,
+        })),
+        whatsapp: whatsappNumber,
+      });
     }
     if (req.method === 'GET' && route === '/api/admin/availability') {
       const params = new URL(req.url, 'http://localhost').searchParams;
@@ -245,14 +319,13 @@ createServer(async (req, res) => {
       if (!selected) return reply(400, { error: 'Ongeldig verzoek.' });
       return reply(200, adminSlots(selected.duration + selected.buffer).filter(slot => slot.day === params.get('day')).map(slot => slot.time));
     }
-    if (req.method === 'POST' && ['/api/bookings', '/api/admin/bookings'].includes(route)) {
-      const admin = route === '/api/admin/bookings';
+    if (route === '/api/bookings') {
+      // Online booking was replaced by requests via WhatsApp: only Olena confirms and enters appointments.
+      return reply(410, { error: 'Online boeken is vervangen door een afspraakaanvraag via WhatsApp. Olena bevestigt elke afspraak persoonlijk.' });
+    }
+    if (req.method === 'POST' && route === '/api/admin/bookings') {
       const body = await readBody(req).catch(() => null);
       if (!body) return reply(400, { error: 'Ongeldig verzoek.' });
-      // Hidden field that people never see; automated form fillers often complete it.
-      if (!admin && body.website) return reply(400, { error: 'Ongeldig verzoek.' });
-      const address = clientAddress(req);
-      if (!admin && !bookingAllowed(address)) return reply(429, { error: 'Je hebt al meerdere afspraken geboekt. Bel of stuur Olena een WhatsApp voor een extra afspraak.' });
       const name = typeof body.name === 'string' ? body.name.trim() : '';
       const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
       const phoneDigits = phone.replace(/\D/g, '');
@@ -261,21 +334,12 @@ createServer(async (req, res) => {
       const id = randomUUID();
       const saved = transaction(() => {
         const selected = configuredServices().find(item => item.id === body.service);
-        if (!admin) {
-          const [today] = local.format(new Date()).split(' ');
-          const upcoming = db.prepare("SELECT phone FROM bookings WHERE day >= ? AND status != 'declined'").all(today)
-            .filter(booking => booking.phone.replace(/\D/g, '') === phoneDigits).length;
-          if (upcoming >= maxUpcomingPerPhone) return 'phone';
-        }
-        const available = admin ? adminSlots(selected.duration + selected.buffer) : slots({ duration: selected.duration + selected.buffer });
-        if (!available.some(slot => slot.day === body.day && slot.time === body.time)) return false;
+        if (!adminSlots(selected.duration + selected.buffer).some(slot => slot.day === body.day && slot.time === body.time)) return false;
         db.prepare("INSERT INTO bookings (id,day,time,service,name,email,status,duration,phone,buffer) VALUES (?,?,?,?,?,?,'confirmed',?,?,?)")
           .run(id, body.day, body.time, body.service, name, '', selected.duration, phone, selected.buffer);
         return true;
       });
-      if (saved === 'phone') return reply(429, { error: 'Met dit telefoonnummer staan al twee afspraken gepland. Bel of stuur Olena een WhatsApp voor een extra afspraak.' });
       if (!saved) return reply(409, { error: 'Dit tijdslot is niet meer beschikbaar.' });
-      if (!admin) recordBooking(address);
       return reply(201, { id, status: 'confirmed', day: body.day, time: body.time, duration: services.find(item => item.id === body.service).duration });
     }
     if (route === '/api/admin/buffers' && req.method === 'GET') {

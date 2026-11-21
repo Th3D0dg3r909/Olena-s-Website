@@ -19,7 +19,6 @@
     "Appointment calendar": "Afsprakenagenda",
     "Availability": "Beschikbaarheid",
     "Appointments": "Afspraken",
-    "Online bookings are confirmed automatically.": "Online boekingen worden automatisch bevestigd.",
     "Time": "Tijd",
     ", manage availability": ", beschikbaarheid beheren",
     ", unavailable": ", niet beschikbaar",
@@ -61,7 +60,19 @@
     "Delete client details": "Klantgegevens verwijderen",
     "Permanently delete this booking with the name and phone number of the client? This cannot be undone.": "Deze afspraak met de naam en het telefoonnummer van de klant definitief verwijderen? Dit kan niet ongedaan worden gemaakt.",
     "This appointment has not taken place yet. Its time becomes available again.": "Deze afspraak heeft nog niet plaatsgevonden. De tijd komt weer beschikbaar.",
-    "Client details deleted.": "Klantgegevens verwijderd."
+    "Client details deleted.": "Klantgegevens verwijderd.",
+    "Log out": "Uitloggen",
+    "Planner login": "Inloggen planner",
+    "Admin login is not configured. Ask the website administrator to set a password of at least 16 characters.": "Inloggen voor beheer is niet ingesteld. Vraag de websitebeheerder een wachtwoord van minstens 16 tekens in te stellen.",
+    "Your session has expired. Please log in again.": "Je sessie is verlopen. Log opnieuw in.",
+    "You have been logged out.": "Je bent uitgelogd.",
+    "Could not reach the website. Check your internet connection and try again.": "De website is niet bereikbaar. Controleer je internetverbinding en probeer het opnieuw.",
+    "Logging in…": "Bezig met inloggen…",
+    "Username": "Gebruikersnaam",
+    "Password": "Wachtwoord",
+    "Log in": "Inloggen",
+    "Forgot your password? Ask the website administrator to set a new one.": "Wachtwoord vergeten? Vraag de websitebeheerder een nieuw wachtwoord in te stellen.",
+    "Clients request appointments via WhatsApp. Add each appointment here after you have confirmed it.": "Klanten vragen afspraken aan via WhatsApp. Zet elke afspraak hier in de planner nadat je hem hebt bevestigd."
   },
   "uk": {
     "Planning": "Планування",
@@ -83,7 +94,6 @@
     "Appointment calendar": "Календар записів",
     "Availability": "Доступний час",
     "Appointments": "Записи",
-    "Online bookings are confirmed automatically.": "Онлайн-записи підтверджуються автоматично.",
     "Time": "Час",
     ", manage availability": ", керування доступним часом",
     ", unavailable": ", недоступно",
@@ -125,6 +135,18 @@
     "Delete client details": "Видалити дані клієнта",
     "Permanently delete this booking with the name and phone number of the client? This cannot be undone.": "Остаточно видалити цей запис з ім’ям і номером телефону клієнта? Цю дію неможливо скасувати.",
     "This appointment has not taken place yet. Its time becomes available again.": "Ця процедура ще не відбулася. Її час знову стане доступним.",
-    "Client details deleted.": "Дані клієнта видалено."
+    "Client details deleted.": "Дані клієнта видалено.",
+    "Log out": "Вийти",
+    "Planner login": "Вхід до планувальника",
+    "Admin login is not configured. Ask the website administrator to set a password of at least 16 characters.": "Вхід для адміністратора не налаштовано. Попросіть адміністратора сайту встановити пароль щонайменше з 16 символів.",
+    "Your session has expired. Please log in again.": "Ваш сеанс завершився. Увійдіть ще раз.",
+    "You have been logged out.": "Ви вийшли з системи.",
+    "Could not reach the website. Check your internet connection and try again.": "Не вдалося з’єднатися із сайтом. Перевірте інтернет-з’єднання та спробуйте ще раз.",
+    "Logging in…": "Вхід…",
+    "Username": "Ім’я користувача",
+    "Password": "Пароль",
+    "Log in": "Увійти",
+    "Forgot your password? Ask the website administrator to set a new one.": "Забули пароль? Попросіть адміністратора сайту встановити новий.",
+    "Clients request appointments via WhatsApp. Add each appointment here after you have confirmed it.": "Клієнти надсилають запити на запис через WhatsApp. Додайте кожен запис сюди після того, як підтвердите його."
   }
 }

@@ -11,16 +11,31 @@ const t = text => dictionary[text] || text;
 const status = document.querySelector('#status');
 const list = document.querySelector('#bookings');
 const labels = { pending: t("Pending"), confirmed: t("Confirmed"), declined: t("Declined") };
-async function request(method, body, endpoint = 'bookings') {
-  const response = await fetch('/api/admin/' + endpoint + '?lang=' + language, {
-    method,
-    headers: { 'Content-Type': 'application/json', 'X-Olena-Request': '1' },
-    body: JSON.stringify(body),
-  });
+// When the session has ended, show the login page again; after logging in Olena returns to the same day.
+function toLogin(code) {
+  const next = new URLSearchParams({ lang: language });
+  if (date.value) next.set('day', date.value);
+  if (code === 'session_expired') next.set('expired', '1');
+  window.location.replace('/admin?' + next);
+  return new Promise(() => {});
+}
+async function checked(response) {
   const result = await response.json();
+  if (response.status === 401) return toLogin(result.code);
   if (!response.ok) throw new Error(result.error);
   return result;
 }
+async function request(method, body, endpoint = 'bookings') {
+  return checked(await fetch('/api/admin/' + endpoint + '?lang=' + language, {
+    method,
+    headers: { 'Content-Type': 'application/json', 'X-Olena-Request': '1' },
+    body: JSON.stringify(body),
+  }));
+}
+document.querySelector('#logout').addEventListener('click', async () => {
+  await fetch('/api/auth/logout?lang=' + language, { method: 'POST', headers: { 'X-Olena-Request': '1' } }).catch(() => {});
+  window.location.replace('/admin?lang=' + language + '&logged-out=1');
+});
 const date = document.querySelector('#planning-day');
 const schedule = document.querySelector('#planning-slots');
 const planningStatus = document.querySelector('#planning-status');
@@ -271,6 +286,7 @@ async function refreshManualAvailability() {
   manualStatus.textContent = t('Loading available times…');
   try {
     const response = await fetch('/api/admin/availability?lang=' + language + '&service=' + encodeURIComponent(manualForm.elements.service.value) + '&day=' + encodeURIComponent(manualForm.elements.day.value));
+    if (response.status === 401) return checked(response);
     if (!response.ok) throw new Error(t('Could not load available times.'));
     const times = await response.json();
     if (sequence !== availabilitySequence) return;
