@@ -250,3 +250,99 @@ describe('requests from this website behind a proxy', () => {
     }
   });
 });
+
+describe('opening-soon mode', () => {
+  const CODE = 'synthetic access code 123';
+  const database = temporaryDatabase();
+  let server;
+  before(async () => {
+    server = await startServer({ ADMIN_PASSWORD: PASSWORD, MAINTENANCE_MODE: 'true', MAINTENANCE_ACCESS_CODE: CODE }, database.path);
+  });
+  after(async () => {
+    await server.stop();
+    database.remove();
+  });
+  const preview = (code, headers = {}) => fetch(server.url + '/api/preview?lang=en', { method: 'POST', headers: { ...json, ...headers }, body: JSON.stringify({ code }) });
+
+  test('visitors see the holding page in their language and no website content', async () => {
+    for (const [path, text] of [['/', 'Binnenkort open'], ['/?lang=en', 'Opening soon'], ['/?lang=uk', 'Незабаром відкриття'], ['/privacy', 'Binnenkort open'], ['/anything', 'Binnenkort open']]) {
+      const response = await fetch(server.url + path);
+      assert.equal(response.status, 503, path);
+      assert.equal(response.headers.get('x-robots-tag'), 'noindex, nofollow');
+      assert.equal(response.headers.get('retry-after'), '86400');
+      const html = await response.text();
+      assert.match(html, new RegExp(text));
+      assert.match(html, /tel:\+31647238444/);
+      assert.match(html, /id="preview-form"/);
+      assert.doesNotMatch(html, /photo-grid|id="services"/);
+    }
+    const options = await fetch(server.url + '/api/options?lang=en');
+    assert.equal(options.status, 503);
+    assert.equal((await options.json()).error, 'The website opens soon.');
+    assert.equal((await fetch(server.url + '/api/reviews')).status, 503);
+  });
+
+  test('styles, scripts, images, the planner and robots.txt stay reachable', async () => {
+    for (const path of ['/style.css', '/preview.js', '/logo-transparent.svg', '/photos/olena-portret-600.webp', '/robots.txt']) {
+      assert.equal((await fetch(server.url + path)).status, 200, path);
+    }
+    const admin = await fetch(server.url + '/admin');
+    assert.equal(admin.status, 200);
+    assert.match(await admin.text(), /id="login-form"/);
+  });
+
+  test('a wrong or cross-site access code is refused', async () => {
+    const wrong = await preview('not the code at all');
+    assert.equal(wrong.status, 401);
+    assert.equal((await wrong.json()).error, 'Incorrect access code.');
+    assert.equal(wrong.headers.get('set-cookie'), null);
+    assert.equal((await preview(CODE, { Origin: 'https://evil.example' })).status, 403);
+    assert.equal((await preview(CODE, { 'X-Olena-Request': '' })).status, 400);
+  });
+
+  test('the access code opens the full website with a preview reminder', async () => {
+    const response = await preview(CODE);
+    assert.equal(response.status, 200);
+    const setCookie = response.headers.get('set-cookie');
+    for (const part of ['__Host-olena_preview=', 'HttpOnly', 'Secure', 'Max-Age=2592000']) assert.ok(setCookie.includes(part), part);
+    assert.ok(!setCookie.includes(CODE.replaceAll(' ', '')) && !setCookie.includes(encodeURIComponent(CODE)), 'the cookie does not contain the code');
+    const cookie = setCookie.split(';')[0];
+    const home = await fetch(server.url + '/?lang=en', { headers: { cookie } });
+    assert.equal(home.status, 200);
+    const html = await home.text();
+    assert.match(html, /class="preview-banner"[^>]*>Preview: the website is not public yet/);
+    assert.match(html, /photo-grid/);
+    assert.equal((await fetch(server.url + '/api/options', { headers: { cookie } })).status, 200);
+    assert.equal((await fetch(server.url + '/privacy', { headers: { cookie } })).status, 200);
+    assert.equal((await fetch(server.url + '/', { headers: { cookie: '__Host-olena_preview=forged-value' } })).status, 503);
+  });
+
+  test('Olena sees the website when she is logged in to the planner', async () => {
+    const login = await fetch(server.url + '/api/auth/login', { method: 'POST', headers: json, body: JSON.stringify({ username: 'olena', password: PASSWORD }) });
+    const cookie = login.headers.get('set-cookie').split(';')[0];
+    const home = await fetch(server.url + '/', { headers: { cookie } });
+    assert.equal(home.status, 200);
+    assert.match(await home.text(), /Voorvertoning: de website is nog niet openbaar/);
+  });
+
+  test('repeated wrong codes are limited', async () => {
+    for (let i = 0; i < 10; i++) await preview('wrong code number ' + i, { 'X-Forwarded-For': '203.0.113.77' });
+    assert.equal((await preview(CODE, { 'X-Forwarded-For': '203.0.113.77' })).status, 429);
+    assert.equal((await preview(CODE, { 'X-Forwarded-For': '203.0.113.78' })).status, 200);
+  });
+
+  test('a new access code ends earlier access, and without a code only the planner login works', async () => {
+    const cookie = (await preview(CODE)).headers.get('set-cookie').split(';')[0];
+    await server.stop();
+    server = await startServer({ ADMIN_PASSWORD: PASSWORD, MAINTENANCE_MODE: 'true', MAINTENANCE_ACCESS_CODE: 'a different access code' }, database.path);
+    assert.equal((await fetch(server.url + '/', { headers: { cookie } })).status, 503);
+    await server.stop();
+    server = await startServer({ ADMIN_PASSWORD: PASSWORD, MAINTENANCE_MODE: 'true', MAINTENANCE_ACCESS_CODE: 'too short' }, database.path);
+    assert.match(server.log, /MAINTENANCE_ACCESS_CODE is ignored/);
+    assert.ok(!server.log.includes('too short'));
+    const html = await (await fetch(server.url + '/')).text();
+    assert.doesNotMatch(html, /id="preview-form"/);
+    assert.match(html, /href="\/admin\?lang=nl"/);
+    assert.equal((await preview('too short')).status, 404);
+  });
+});

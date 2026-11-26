@@ -46,5 +46,9 @@
   "Gebruikersnaam of wachtwoord is onjuist.": "Неправильне ім’я користувача або пароль.",
   "Je sessie is verlopen. Log opnieuw in.": "Ваш сеанс завершився. Увійдіть ще раз.",
   "Dit verzoek is geweigerd omdat het niet van deze website komt.": "Цей запит відхилено, бо він надійшов не з цього сайту.",
-  "Online boeken is vervangen door een afspraakaanvraag via WhatsApp. Olena bevestigt elke afspraak persoonlijk.": "Онлайн-запис замінено запитом через WhatsApp. Олена особисто підтверджує кожен запис."
+  "Online boeken is vervangen door een afspraakaanvraag via WhatsApp. Olena bevestigt elke afspraak persoonlijk.": "Онлайн-запис замінено запитом через WhatsApp. Олена особисто підтверджує кожен запис.",
+  "Onjuiste toegangscode.": "Неправильний код доступу.",
+  "Te veel pogingen. Probeer het over 15 minuten opnieuw.": "Забагато спроб. Спробуйте ще раз через 15 хвилин.",
+  "Er is geen toegangscode ingesteld.": "Код доступу не налаштовано.",
+  "De website gaat binnenkort open.": "Сайт незабаром запрацює."
 }
