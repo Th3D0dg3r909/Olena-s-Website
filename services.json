@@ -324,19 +324,38 @@
   },
   {
     "category": "PROFESSIONELE PEELINGS",
-    "name": "PRX-T33 Gezichtspeeling",
+    "name": "PRX-T33 Gezicht",
     "description": "Biorevitaliserende peeling zonder naalden voor een directe glow, gladdere fijne lijntjes en een langdurig liftend effect.",
     "price": 110,
-    "durationLabel": "30-40 min",
-    "duration": 40,
+    "durationLabel": "30 min",
+    "duration": 30,
     "id": "treatment-18",
     "en": {
       "category": "PROFESSIONAL PEELS",
-      "name": "PRX-T33 Facial Peel",
+      "name": "PRX-T33 Face",
       "description": "No-needle biorevitalizing peel for instant glow, smoother fine lines, and long-lasting lift."
     },
     "uk": {
-      "name": "Пілінг обличчя PRX-T33",
+      "name": "PRX-T33 обличчя",
+      "description": "Біоревіталізувальний пілінг без голок для миттєвого сяйва, розгладження дрібних зморшок і тривалого ліфтинг-ефекту.",
+      "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
+    }
+  },
+  {
+    "category": "PROFESSIONELE PEELINGS",
+    "name": "PRX-T33 Gezicht + Hals",
+    "description": "Biorevitaliserende peeling zonder naalden voor een directe glow, gladdere fijne lijntjes en een langdurig liftend effect.",
+    "price": 140,
+    "durationLabel": "40 min",
+    "duration": 40,
+    "id": "treatment-28",
+    "en": {
+      "category": "PROFESSIONAL PEELS",
+      "name": "PRX-T33 Face + Neck",
+      "description": "No-needle biorevitalizing peel for instant glow, smoother fine lines, and long-lasting lift."
+    },
+    "uk": {
+      "name": "PRX-T33 обличчя + шия",
       "description": "Біоревіталізувальний пілінг без голок для миттєвого сяйва, розгладження дрібних зморшок і тривалого ліфтинг-ефекту.",
       "category": "ПРОФЕСІЙНІ ПІЛІНГИ"
     }

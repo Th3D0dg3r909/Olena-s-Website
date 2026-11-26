@@ -154,11 +154,25 @@ describe('with a valid admin password', () => {
     const options = await (await fetch(server.url + '/api/options?lang=en')).json();
     assert.equal(options.whatsapp, '31647238444');
     assert.equal(options.slots, undefined);
-    const prx = options.services.find(item => item.id === 'treatment-18');
-    assert.equal(prx.name, 'PRX-T33 Facial Peel');
-    assert.equal(prx.description, 'No-needle biorevitalizing peel for instant glow, smoother fine lines, and long-lasting lift.');
-    assert.equal(prx.price, 110);
-    assert.equal(prx.durationLabel, '30-40 min');
+    // PRX-T33 Face keeps its id (existing appointments stay linked); Face + Neck follows directly below it.
+    const index = options.services.findIndex(item => item.id === 'treatment-18');
+    const [face, neck] = options.services.slice(index, index + 2);
+    for (const [item, id, name, price, label] of [[face, 'treatment-18', 'PRX-T33 Face', 110, '30 min'], [neck, 'treatment-28', 'PRX-T33 Face + Neck', 140, '40 min']]) {
+      assert.deepEqual([item.id, item.name, item.price, item.durationLabel], [id, name, price, label]);
+      assert.equal(item.description, 'No-needle biorevitalizing peel for instant glow, smoother fine lines, and long-lasting lift.');
+    }
+  });
+
+  test('photos are served as WebP and nothing else is reachable through the photo folder', async () => {
+    const photo = await fetch(server.url + '/photos/olena-portret-600.webp?v=1');
+    assert.equal(photo.status, 200);
+    assert.equal(photo.headers.get('content-type'), 'image/webp');
+    assert.match(photo.headers.get('cache-control'), /immutable/);
+    for (const path of ['/photos/../server.js', '/photos/%2e%2e/server.js', '/photos/missing.webp']) {
+      assert.equal((await fetch(server.url + path)).status, 404, path);
+    }
+    const home = await (await fetch(server.url + '/')).text();
+    assert.match(home, /\/photos\/olena-portret-600\.webp\?v=[0-9a-f]{12}/, 'photo links get a content version');
   });
 
   test('logout ends the session on the server', async () => {

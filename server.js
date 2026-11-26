@@ -2,7 +2,7 @@ import { getReviews } from './reviews.js';
 import { createAuth } from './auth.js';
 import { createServer } from 'node:http';
 import { randomUUID, createHash } from 'node:crypto';
-import { readFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
@@ -146,6 +146,10 @@ const assets = new Map(Object.entries({
   '/planner-translations.json': ['../planner-translations.json', 'application/json; charset=utf-8'],
   '/admin.js': ['admin.js', 'text/javascript; charset=utf-8'],
 }).map(([route, [file,type]]) => [route, [readFileSync(new URL('./public/' + file, import.meta.url)), type]]));
+// Photos of Olena and her work: every WebP file in public/photos is served at /photos/<name>.
+for (const name of readdirSync(new URL('./public/photos/', import.meta.url)).filter(name => /^[\w-]+\.webp$/.test(name))) {
+  assets.set('/photos/' + name, [readFileSync(new URL('./public/photos/' + name, import.meta.url)), 'image/webp']);
+}
 // Each ?v= in a page is set to the linked file's content hash at startup, so an edited file always gets a new
 // address and browsers never keep an outdated copy, even though linked files are cached for a year.
 const versions = new Map([...assets].map(([route, [body]]) => [route, createHash('sha256').update(body).digest('hex').slice(0, 12)]));
@@ -162,7 +166,7 @@ function alternates(address) {
 }
 for (const [route, entry] of assets) {
   if (entry[1].startsWith('text/html')) {
-    let html = entry[0].toString().replace(/(\/[\w.-]+)\?v=[\w-]+/g, (link, path) => versions.has(path) ? path + '?v=' + versions.get(path) : link);
+    let html = entry[0].toString().replace(/(\/[\w./-]+)\?v=[\w-]+/g, (link, path) => versions.has(path) ? path + '?v=' + versions.get(path) : link);
     const page = publicPages.find(([file]) => file === route);
     if (page && publicUrl) html = html.replace('</head>', alternates(page[1]) + '\n</head>');
     entry[0] = Buffer.from(html);

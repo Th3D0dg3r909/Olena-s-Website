@@ -46,7 +46,7 @@ In de planner zet Olena bevestigde afspraken (tot een jaar vooruit, ook in geblo
 
 ## Inhoud
 
-De 27 behandelingen met prijzen, behandelduur en teksten in drie talen staan in `services.json`; de paginateksten staan in `public/index*.html`, `public/privacy*.html` en de vertaalbestanden. Olena kan deze nog niet zelf aanpassen: wijzigingen lopen via de repository. Het sfeerbeeld in de hero (`public/studio.webp`, `public/studio-mobile.webp`) is geen foto van de studio zelf; het label „Sfeerbeeld” geeft dat aan.
+De 28 behandelingen met prijzen, behandelduur en teksten in drie talen staan in `services.json`; de paginateksten staan in `public/index*.html`, `public/privacy*.html` en de vertaalbestanden. Olena kan deze nog niet zelf aanpassen: wijzigingen lopen via de repository. Het sfeerbeeld in de hero (`public/studio.webp`, `public/studio-mobile.webp`) is geen foto van de studio zelf; het label „Sfeerbeeld” geeft dat aan. De sectie „Olena en haar werk” toont zes foto's van Olena uit de map Photos in Google Drive (`public/photos/`, WebP in 600 en 1200 pixels breed, 4:5). Elk `.webp`-bestand in die map wordt automatisch geserveerd; plaats alleen foto's waarvoor toestemming is van iedereen die herkenbaar in beeld is.
 
 ## Privacy
 
