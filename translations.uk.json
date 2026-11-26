@@ -37,11 +37,14 @@
   "We kunnen de boeking niet controleren. Bel Olena voordat je opnieuw boekt.": "Не вдалося перевірити ваш запис. Зателефонуйте Олені, перш ніж записуватися знову.",
   "Reviews are not connected yet.": "Відгуки ще не підключено.",
   "Google reviews are temporarily unavailable.": "Відгуки Google тимчасово недоступні.",
-  "Beheer is nog niet ingesteld.": "Керування ще не налаштовано.",
   "Log in om afspraken te beheren.": "Увійдіть, щоб керувати записами.",
   "Kies een datum en tijdslot.": "Виберіть дату та час.",
   "Dit tijdslot is al bezet of geblokkeerd.": "Цей час уже зайнято або заблоковано.",
   "Deze aanvraag is al verwerkt of bestaat niet.": "Цей запис уже опрацьовано або він не існує.",
-  "Je hebt al meerdere afspraken geboekt. Bel of stuur Olena een WhatsApp voor een extra afspraak.": "Ви вже записалися на кілька процедур. Щоб додати ще один запис, зателефонуйте Олені або напишіть у WhatsApp.",
-  "Met dit telefoonnummer staan al twee afspraken gepland. Bel of stuur Olena een WhatsApp voor een extra afspraak.": "На цей номер телефону вже є два записи. Щоб додати ще один, зателефонуйте Олені або напишіть у WhatsApp."
+  "Inloggen voor beheer is niet ingesteld.": "Вхід для адміністратора не налаштовано.",
+  "Te veel inlogpogingen. Probeer het over 15 minuten opnieuw.": "Забагато спроб входу. Спробуйте ще раз через 15 хвилин.",
+  "Gebruikersnaam of wachtwoord is onjuist.": "Неправильне ім’я користувача або пароль.",
+  "Je sessie is verlopen. Log opnieuw in.": "Ваш сеанс завершився. Увійдіть ще раз.",
+  "Dit verzoek is geweigerd omdat het niet van deze website komt.": "Цей запит відхилено, бо він надійшов не з цього сайту.",
+  "Online boeken is vervangen door een afspraakaanvraag via WhatsApp. Olena bevestigt elke afspraak persoonlijk.": "Онлайн-запис замінено запитом через WhatsApp. Олена особисто підтверджує кожен запис."
 }

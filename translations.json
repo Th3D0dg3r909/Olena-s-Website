@@ -41,8 +41,7 @@
   "Controleer je naam, e-mailadres en behandeling.": "Please check your name, email address and treatment.",
   "Dit tijdslot is niet meer beschikbaar.": "This appointment time is no longer available.",
   "Er ging iets mis. Probeer het opnieuw.": "Something went wrong. Please try again.",
-  "Beheer is nog niet ingesteld.": "Administration has not been configured yet.",
-  "Log in om afspraken te beheren.": "Sign in to manage appointments.",
+  "Log in om afspraken te beheren.": "Log in to manage appointments.",
   "Kies een datum en tijdslot.": "Choose a date and time slot.",
   "Dit tijdslot is al bezet of geblokkeerd.": "This time slot is already occupied or blocked.",
   "Deze aanvraag is al verwerkt of bestaat niet.": "This request has already been processed or no longer exists.",
@@ -51,6 +50,10 @@
   "Je afspraak is bevestigd.": "Your appointment is confirmed.",
   "Boekingsnummer": "Booking reference",
   "We kunnen de boeking niet controleren. Bel Olena voordat je opnieuw boekt.": "We could not verify your booking. Call Olena before booking again.",
-  "Je hebt al meerdere afspraken geboekt. Bel of stuur Olena een WhatsApp voor een extra afspraak.": "You have already booked several appointments. Please call Olena or send a WhatsApp message to book another one.",
-  "Met dit telefoonnummer staan al twee afspraken gepland. Bel of stuur Olena een WhatsApp voor een extra afspraak.": "Two appointments are already booked with this phone number. Please call Olena or send a WhatsApp message to book another one."
+  "Inloggen voor beheer is niet ingesteld.": "Admin login is not configured.",
+  "Te veel inlogpogingen. Probeer het over 15 minuten opnieuw.": "Too many login attempts. Please try again in 15 minutes.",
+  "Gebruikersnaam of wachtwoord is onjuist.": "Incorrect username or password.",
+  "Je sessie is verlopen. Log opnieuw in.": "Your session has expired. Please log in again.",
+  "Dit verzoek is geweigerd omdat het niet van deze website komt.": "This request was refused because it did not come from this website.",
+  "Online boeken is vervangen door een afspraakaanvraag via WhatsApp. Olena bevestigt elke afspraak persoonlijk.": "Online booking has been replaced by appointment requests via WhatsApp. Olena confirms every appointment personally."
 }

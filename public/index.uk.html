@@ -30,27 +30,37 @@
   <a class="instagram-visit" href="https://www.instagram.com/olena_cosmetologist_ua/" target="_blank" rel="noopener noreferrer">Переглянути Instagram <span aria-hidden="true">↗</span></a>
 </aside>
 </section>
+<section id="olena" class="gallery-section" aria-labelledby="gallery-title">
+<h2 id="gallery-title">Олена та її робота</h2>
+<p>Погляд на Олену в кабінеті, на обладнання й засоби, з якими вона працює, та на її професійне навчання.</p>
+<ul class="photo-grid">
+<li><figure><img src="/photos/olena-portret-600.webp?v=0" srcset="/photos/olena-portret-600.webp?v=0 600w, /photos/olena-portret-1200.webp?v=0 1200w" sizes="(max-width: 42rem) 50vw, (max-width: 68rem) 33vw, 22rem" width="600" height="750" alt="Олена в білій футболці біля кушетки, на стіні картина з рожевими трояндами." loading="lazy" decoding="async"><figcaption>Олена в кабінеті</figcaption></figure></li>
+<li><figure><img src="/photos/olena-zemits-apparaat-600.webp?v=0" srcset="/photos/olena-zemits-apparaat-600.webp?v=0 600w, /photos/olena-zemits-apparaat-1200.webp?v=0 1200w" sizes="(max-width: 42rem) 50vw, (max-width: 68rem) 33vw, 22rem" width="600" height="750" alt="Олена в студії тримає маніпулу апарата ZEMITS DermeLuxx Pro, позаду засоби для догляду." loading="lazy" decoding="async"><figcaption>З апаратом ZEMITS DermeLuxx Pro для гідродермабразії</figcaption></figure></li>
+<li><figure><img src="/photos/olena-raam-600.webp?v=0" srcset="/photos/olena-raam-600.webp?v=0 600w, /photos/olena-raam-1200.webp?v=0 1200w" sizes="(max-width: 42rem) 50vw, (max-width: 68rem) 33vw, 22rem" width="600" height="750" alt="Олена в бірюзовому робочому костюмі біля вікна." loading="lazy" decoding="async"><figcaption>Олена</figcaption></figure></li>
+<li><figure><img src="/photos/olena-pumpkin-peel-600.webp?v=0" srcset="/photos/olena-pumpkin-peel-600.webp?v=0 600w, /photos/olena-pumpkin-peel-1200.webp?v=0 1016w" sizes="(max-width: 42rem) 50vw, (max-width: 68rem) 33vw, 22rem" width="600" height="750" alt="Олена в фіолетовому робочому костюмі тримає баночку Shiny Pumpkin Peel." loading="lazy" decoding="async"><figcaption>Гарбузовий пілінг і догляд</figcaption></figure></li>
+<li><figure><img src="/photos/olena-zemits-hydrodiamond-600.webp?v=0" srcset="/photos/olena-zemits-hydrodiamond-600.webp?v=0 600w, /photos/olena-zemits-hydrodiamond-1200.webp?v=0 1200w" sizes="(max-width: 42rem) 50vw, (max-width: 68rem) 33vw, 22rem" width="600" height="750" alt="Олена біля апарата ZEMITS DermeLuxx Pro на тлі банера про технологію Hydrodiamond." loading="lazy" decoding="async"><figcaption>Технологія ZEMITS Hydrodiamond</figcaption></figure></li>
+<li><figure><img src="/photos/olena-skinon-proage-600.webp?v=0" srcset="/photos/olena-skinon-proage-600.webp?v=0 600w, /photos/olena-skinon-proage-1200.webp?v=0 1200w" sizes="(max-width: 42rem) 50vw, (max-width: 68rem) 33vw, 22rem" width="600" height="750" alt="Олена на заході SkinOn proAge на тлі світлового логотипа SkinOn і білих квітів." loading="lazy" decoding="async"><figcaption>Професійне навчання: SkinOn proAge</figcaption></figure></li>
+</ul>
+</section>
 <section id="behandelingen">
 <h2>Процедури</h2><p>Ознайомтеся з процедурами, цінами та тривалістю.</p>
 <div class="cards" id="services"></div>
 </section>
-<section id="afspraak" class="booking-section"><div><h2>Записатися</h2><p>Виберіть процедуру й час, вкажіть ім’я та номер телефону. Ваш запис буде підтверджено одразу.</p></div><div class="booking-panel">
-<form id="booking">
-<label>Процедура<select name="service" required></select></label>
-<label>Дата<select name="day" required></select></label>
-<label>Час (за місцевим часом Нідерландів)<select name="time" required></select></label>
-<label>Ім’я<input name="name" autocomplete="name" maxlength="100" required></label>
-<label>Номер телефону<input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required></label>
-<label class="form-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
-<p>Ваше ім’я та номер телефону використовуються для організації візиту. Ознайомтеся з <a href="/privacy?lang=uk">політикою конфіденційності</a>.</p>
-<button disabled>Записатися</button>
-</form><p id="status" role="status"></p><a id="whatsapp" href="https://wa.me/31647238444">Запитати про цю процедуру у WhatsApp</a></div>
+<section id="afspraak" class="booking-section"><div><h2>Записатися на процедуру</h2><p>Виберіть процедуру й надішліть Олені повідомлення у WhatsApp із бажаним днем і часом. Олена особисто підтвердить запис або запропонує інший час. Запис вважається остаточним лише після її підтвердження.</p></div><div class="booking-panel">
+<div id="request" class="request-panel">
+<label>Процедура<select id="request-service" name="service"></select></label>
+<a class="button whatsapp-request" id="request-link" href="https://wa.me/31647238444" target="_blank" rel="noopener noreferrer">Надіслати запит на запис у WhatsApp</a>
+<p class="response-time">Я відповідаю на повідомлення з 09:00 до 21:00, зазвичай протягом 4 годин.</p>
+<p class="request-note">WhatsApp відкриється з готовим повідомленням, яке можна змінити. Нічого не буде надіслано, доки ви самі не відправите повідомлення, і час не резервується, доки Олена не підтвердить запис. Повідомлення не потрапляє до календаря сайту автоматично. Ознайомтеся з <a href="/privacy?lang=uk">політикою конфіденційності</a>.</p>
+<p class="request-call">Бажаєте зателефонувати? Телефонуйте або пишіть Олені у WhatsApp: <a href="tel:+31647238444">06 47238444</a></p>
+</div><p id="status" role="status"></p></div>
 </section>
 <section id="reviews" aria-labelledby="reviews-title"><h2 id="reviews-title">Відгуки клієнтів</h2><p id="reviews-status" role="status"></p><div id="google-reviews"></div><p class="review-attribution">Google Maps · <a href="https://support.google.com/contributionpolicy/answer/7400114">Правила відгуків</a> · <a href="https://maps.google.com/help/terms_maps/">Умови Google Maps</a> · <a href="https://policies.google.com/privacy">Політика конфіденційності Google</a></p></section>
 <section id="contact" aria-labelledby="contact-title">
 <h2 id="contact-title">Контакти та маршрут</h2>
 <p>Olena Skin Care Studio<br>Doezastraat 31<br>2311 HA Leiden</p>
 <p>Вівторок, четвер і субота · 10:00–21:00<br>Останній початок процедури — о 19:00</p>
+<p class="response-time">Я відповідаю на повідомлення з 09:00 до 21:00, зазвичай протягом 4 годин.</p>
 <div class="actions"><a class="button" href="tel:+31647238444">Зателефонувати 06 47238444</a><a class="button secondary" data-whatsapp href="https://wa.me/31647238444">Написати у WhatsApp</a>
 <a class="button secondary" href="https://www.google.com/maps/dir/?api=1&amp;destination=Doezastraat%2031%2C%202311%20HA%20Leiden">Прокласти маршрут</a></div>
 </section>
