@@ -21,6 +21,8 @@ Each environment is a separate Hostinger website with its own environment variab
 | `PUBLIC_URL` | `https://olena.td909-creativedesign.nl` | `https://<final domain>` |
 | `ALLOW_INDEXING` | Not set | `true`, only at approved launch |
 | `REDIRECT_TO_PUBLIC_URL` | Not set | `true` if `www` and non-`www` should end up on one address |
+| `MAINTENANCE_MODE` | Not set | `true` until the launch: visitors see an “Opening soon” page |
+| `MAINTENANCE_ACCESS_CODE` | Not set | A code of 12+ characters for people other than Olena who need to see the site before launch |
 | `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID` | Set | Set (the same key can be used; restrict it in Google Cloud) |
 | `WHATSAPP_NUMBER` | Optional (default 31647238444) | Optional, set if the business number changes |
 | `ADMIN_USERNAME`, `ADMIN_SESSION_IDLE_MINUTES`, `ADMIN_SESSION_MAX_HOURS`, `REVIEWS_CACHE_MINUTES`, `BOOKING_RETENTION_MONTHS` | Optional | Optional |
@@ -41,7 +43,7 @@ Changing the password signs out every existing session.
 1. **Approval.** Olena approves the content, privacy statement and booking workflow on the concept site.
 2. **Domain.** Olena registers or provides her domain; point it to Hostinger and add it as a separate website with HTTPS (SSL) enabled.
 3. **Deploy.** Connect the same GitHub repository and branch, with the build settings above.
-4. **Variables.** Set the production variables above, with a new admin password. Leave `ALLOW_INDEXING` unset for now.
+4. **Variables.** Set the production variables above, with a new admin password. Set `MAINTENANCE_MODE=true` (and optionally `MAINTENANCE_ACCESS_CODE`) so the new domain shows “Opening soon” while it is checked. Leave `ALLOW_INDEXING` unset for now.
 5. **Data.** Decide which data moves:
    - If the concept database holds real appointments that must continue, stop new entries on the concept site, back up the file (download it from File Manager), and copy it to the production `DATABASE_PATH` before the first production start.
    - Otherwise start production with an empty database. Never copy test appointments.
@@ -53,6 +55,7 @@ Changing the password signs out every existing session.
    - Opening `/api/admin/bookings` without logging in returns an error, not data.
    - Each treatment's WhatsApp button opens a chat with the right number and message in all three languages; the phone link works.
    - The page source contains `<link rel="canonical" href="https://<final domain>/...">`, and `/sitemap.xml` lists the six pages on the final domain.
-7. **Indexing.** After approval, set `ALLOW_INDEXING=true` on production only. Check that the response no longer has `X-Robots-Tag: noindex` and that `/robots.txt` names the sitemap. Optionally submit the sitemap in Google Search Console.
-8. **Concept site.** Decide: keep it as a noindex review site with its own data, or redirect it to the final domain (set `PUBLIC_URL` to the final domain and `REDIRECT_TO_PUBLIC_URL=true` on the concept website). The concept site never gets `ALLOW_INDEXING`.
-9. **Afterwards.** Update the Google Business profile and Instagram bio with the new address, and check that reviews still load.
+7. **Open the site.** Remove `MAINTENANCE_MODE` (and `MAINTENANCE_ACCESS_CODE`) and save; the app restarts and everyone sees the website.
+8. **Indexing.** After approval, set `ALLOW_INDEXING=true` on production only. Check that the response no longer has `X-Robots-Tag: noindex` and that `/robots.txt` names the sitemap. Optionally submit the sitemap in Google Search Console.
+9. **Concept site.** Decide: keep it as a noindex review site with its own data, or redirect it to the final domain (set `PUBLIC_URL` to the final domain and `REDIRECT_TO_PUBLIC_URL=true` on the concept website). The concept site never gets `ALLOW_INDEXING`.
+10. **Afterwards.** Update the Google Business profile and Instagram bio with the new address, and check that reviews still load.

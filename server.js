@@ -1,5 +1,6 @@
 import { getReviews } from './reviews.js';
 import { createAuth } from './auth.js';
+import { createMaintenance } from './maintenance.js';
 import { createServer } from 'node:http';
 import { randomUUID, createHash } from 'node:crypto';
 import { readFileSync, readdirSync, mkdirSync } from 'node:fs';
@@ -118,6 +119,13 @@ const secureCookies = publicUrl ? publicUrl.protocol === 'https:' : process.env.
 const whatsappNumber = /^\d{8,15}$/.test(process.env.WHATSAPP_NUMBER || '') ? process.env.WHATSAPP_NUMBER : '31647238444';
 const auth = createAuth({ db, secureCookies });
 setInterval(() => auth.removeExpired(), 60 * 60 * 1000).unref();
+const maintenance = createMaintenance({ db, secureCookies });
+if (maintenance.enabled) console.log('Opening-soon mode is on: visitors see the holding page' + (maintenance.codeConfigured ? '; an access code is set.' : '; only a planner login gives access.'));
+const previewBanner = {
+  nl: 'Voorvertoning: de website is nog niet openbaar. Bezoekers zien de pagina ‘Binnenkort open’.',
+  en: 'Preview: the website is not public yet. Visitors see the “Opening soon” page.',
+  uk: 'Попередній перегляд: сайт ще не відкритий для відвідувачів. Вони бачать сторінку «Незабаром відкриття».',
+};
 
 const assets = new Map(Object.entries({
   '/': ['index.html', 'text/html; charset=utf-8'],
@@ -142,6 +150,11 @@ const assets = new Map(Object.entries({
   '/admin': ['admin.html', 'text/html; charset=utf-8'],
   // Not reachable by its own address: shown at /admin until Olena is logged in.
   'login.html': ['login.html', 'text/html; charset=utf-8'],
+  // Shown instead of the website while MAINTENANCE_MODE=true.
+  'coming-soon.nl': ['coming-soon.html', 'text/html; charset=utf-8'],
+  'coming-soon.en': ['coming-soon.en.html', 'text/html; charset=utf-8'],
+  'coming-soon.uk': ['coming-soon.uk.html', 'text/html; charset=utf-8'],
+  '/preview.js': ['preview.js', 'text/javascript; charset=utf-8'],
   '/login.js': ['login.js', 'text/javascript; charset=utf-8'],
   '/planner-translations.json': ['../planner-translations.json', 'application/json; charset=utf-8'],
   '/admin.js': ['admin.js', 'text/javascript; charset=utf-8'],
@@ -256,6 +269,31 @@ createServer(async (req, res) => {
           : { error: 'Log in om afspraken te beheren.', code: 'login_required' });
       }
     }
+    let previewing = false;
+    if (maintenance.enabled) {
+      if (route === '/api/preview') {
+        if (req.method !== 'POST' || !sameSite(req)) return reply(403, { error: 'Dit verzoek is geweigerd omdat het niet van deze website komt.' });
+        const body = await readBody(req).catch(() => null);
+        if (!body) return reply(400, { error: 'Ongeldig verzoek.' });
+        const result = maintenance.tryCode(body.code, clientAddress(req));
+        if (result.ok) res.setHeader('Set-Cookie', result.cookie);
+        return reply(result.status, result.ok ? { ok: true } : { error: result.error });
+      }
+      // The planner, login, robots.txt and the files pages need (styles, scripts, images) stay reachable.
+      const open = route === '/admin' || route.startsWith('/api/auth/') || adminApi || route === '/robots.txt' ||
+        (assets.has(route) && !assets.get(route)[1].startsWith('text/html'));
+      if (!open) {
+        previewing = maintenance.hasPreviewCookie(req) || (auth.configured && auth.session(req) === 'valid');
+        if (!previewing) {
+          res.setHeader('Retry-After', '86400');
+          if (route.startsWith('/api/')) return reply(503, { error: 'De website gaat binnenkort open.' });
+          let html = assets.get('coming-soon.' + language)[0].toString();
+          if (!maintenance.codeConfigured) html = html.replace(/<form id="preview-form">[\s\S]*?<\/form>/, '');
+          res.writeHead(503, { 'Content-Type': 'text/html; charset=utf-8' });
+          return res.end(html);
+        }
+      }
+    }
     if (req.method === 'GET' && route === '/admin') {
       const state = auth.configured ? auth.session(req) : 'not-configured';
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -288,6 +326,11 @@ createServer(async (req, res) => {
     }
     if (req.method === 'GET' && assets.has(route) && route !== '/admin') {
       const [body, type, etag] = assets.get(localizedPages[route] && language !== 'nl' ? localizedPages[route] + '.' + language + '.html' : route);
+      if (previewing && type.startsWith('text/html')) {
+        // Olena or someone with the access code sees the site, with a reminder that it is not public yet.
+        res.writeHead(200, { 'Content-Type': type });
+        return res.end(body.toString().replace(/<body[^>]*>/, tag => tag + '<div class="preview-banner" role="status">' + previewBanner[language] + '</div>'));
+      }
       // Files linked with ?v=<content hash> never change, so browsers may keep them for a year.
       // Pages and other files are checked with the server on each visit and only downloaded again when changed.
       const versioned = new URL(req.url, 'http://localhost').searchParams.has('v') && !type.startsWith('text/html');

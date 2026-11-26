@@ -25,6 +25,8 @@ Open http://localhost:3000. `npm test` draait de tests met tijdelijke databases;
 | `PUBLIC_URL` | Openbaar adres van deze omgeving, bijvoorbeeld `https://olena.td909-creativedesign.nl`. Zorgt voor canonical-links, hreflang en `/sitemap.xml`, bepaalt het toegestane adres voor beheerverzoeken en of cookies `Secure` zijn (bij `https`). |
 | `ALLOW_INDEXING` | Alleen op de goedgekeurde productiesite `true`. Anders krijgt elke pagina `X-Robots-Tag: noindex, nofollow` en verbiedt `robots.txt` alles. |
 | `REDIRECT_TO_PUBLIC_URL` | `true` stuurt verzoeken op een andere hostnaam met een 301 door naar `PUBLIC_URL`. Standaard uit. |
+| `MAINTENANCE_MODE` | `true` zet de site op „Binnenkort open”: bezoekers zien een wachtpagina met contactgegevens (HTTP 503). Ingelogd op de planner ziet Olena de hele site, met een voorvertoningsbalk. |
+| `MAINTENANCE_ACCESS_CODE` | Optioneel, minimaal 12 tekens. Met deze code op de wachtpagina krijgen anderen (zoals de websitebeheerder) 30 dagen toegang in die browser. Een nieuwe code maakt eerdere toegang ongeldig. |
 | `COOKIE_SECURE` | Alleen zonder `PUBLIC_URL`: `false` voor lokaal testen over http. |
 | `WHATSAPP_NUMBER` | Optioneel internationaal nummer met alleen cijfers. Standaard 31647238444, het nummer dat al op de website stond. |
 | `REVIEWS_CACHE_MINUTES` | Standaard 60 (5 tot 1440). Zo lang worden Google-reviews in het geheugen bewaard. |

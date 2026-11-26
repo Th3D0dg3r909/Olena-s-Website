@@ -1615,3 +1615,17 @@ input, select { max-width: 100%; min-width: 0; width: 100%; font-size: 1rem; }
 .studio-instagram .instagram-visit {display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.7rem 1rem;border-radius:2rem;border:1px solid var(--gold);color:var(--ink);text-decoration:none;font-weight:600;font-size:.9rem;white-space:normal;text-align:center}
 .studio-instagram .instagram-visit:hover,.studio-instagram .instagram-visit:focus-visible {background:var(--gold);color:white}
 @media(max-width:48rem){.studio-instagram{padding:1.1rem;gap:.75rem}.studio-instagram .instagram-visit{width:100%}}
+
+/* "Opening soon" holding page and the preview reminder for people with access. */
+.coming-soon main { display: grid; place-items: center; gap: 1.5rem; min-height: calc(100svh - 12rem); padding: clamp(2rem, 6vw, 4rem) 5vw; }
+.coming-soon-panel { max-width: 40rem; text-align: center; }
+.coming-soon-panel .studio-logo { display: block; margin: 0 auto 1rem; width: 110px; height: auto; }
+.coming-soon-panel h1 { font-size: clamp(2.6rem, 7vw, 4.5rem); margin: .2em 0 .4em; }
+.coming-soon-panel .actions { justify-content: center; margin-top: 1.5rem; }
+.coming-soon-panel .response-time { margin-top: 1.25rem; }
+.preview-access { width: min(100%, 26rem); padding: .75rem 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.preview-access summary { cursor: pointer; color: var(--muted); font-size: .9375rem; }
+.preview-access form { margin-top: 1rem; }
+.preview-access form button { width: 100%; }
+.preview-access p { font-size: .875rem; }
+.preview-banner { position: sticky; top: 0; z-index: 20; padding: .5rem 5vw; background: #644617; color: #fffaf0; font-size: .875rem; text-align: center; }

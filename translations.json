@@ -55,5 +55,9 @@
   "Gebruikersnaam of wachtwoord is onjuist.": "Incorrect username or password.",
   "Je sessie is verlopen. Log opnieuw in.": "Your session has expired. Please log in again.",
   "Dit verzoek is geweigerd omdat het niet van deze website komt.": "This request was refused because it did not come from this website.",
-  "Online boeken is vervangen door een afspraakaanvraag via WhatsApp. Olena bevestigt elke afspraak persoonlijk.": "Online booking has been replaced by appointment requests via WhatsApp. Olena confirms every appointment personally."
+  "Online boeken is vervangen door een afspraakaanvraag via WhatsApp. Olena bevestigt elke afspraak persoonlijk.": "Online booking has been replaced by appointment requests via WhatsApp. Olena confirms every appointment personally.",
+  "Onjuiste toegangscode.": "Incorrect access code.",
+  "Te veel pogingen. Probeer het over 15 minuten opnieuw.": "Too many attempts. Please try again in 15 minutes.",
+  "Er is geen toegangscode ingesteld.": "No access code has been set.",
+  "De website gaat binnenkort open.": "The website opens soon."
 }
