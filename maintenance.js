@@ -6,7 +6,13 @@ const MIN_CODE_LENGTH = 12;
 const COOKIE_DAYS = 30;
 
 export function createMaintenance({ db, env = process.env, now = () => Date.now(), log = console, secureCookies = true }) {
-  const enabled = env.MAINTENANCE_MODE === 'true';
+  // Accept the usual ways of writing "on" (true, TRUE, "true", 1, yes, on, ja, aan). An unrecognised value keeps the
+  // site open but is logged, so a typo in the hosting panel is easy to find.
+  const setting = String(env.MAINTENANCE_MODE ?? '').trim().replace(/^["']|["']$/g, '').trim().toLowerCase();
+  const enabled = ['true', '1', 'yes', 'on', 'ja', 'aan'].includes(setting);
+  if (setting && !enabled && !['false', '0', 'no', 'off', 'nee', 'uit'].includes(setting)) {
+    log.error('MAINTENANCE_MODE has an unrecognised value, so the website is open. Use true to show the "Opening soon" page.');
+  }
   let code = env.MAINTENANCE_ACCESS_CODE || '';
   if (enabled && code && [...code].length < MIN_CODE_LENGTH) {
     log.error('MAINTENANCE_ACCESS_CODE is ignored: it must be at least ' + MIN_CODE_LENGTH + ' characters. Only a planner login gives access.');
